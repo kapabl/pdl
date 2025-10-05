@@ -1,0 +1,12 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class OrderEventSource
+{
+    const string User = "user";
+    const string Store = "store";
+    const string System = "system";
+    const string Admin = "admin";
+    const string Courier = "courier";
+}
+}

@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.view.grid
+{
+
+public class PagingRequest
+{
+    int page;
+    int count;
+    bool nextPageAvailable;
+
+}
+}

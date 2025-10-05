@@ -1,0 +1,36 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class CouponRow: Row
+{
+    string code;
+    string createdAt;
+    string description;
+    string endDate;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property int id;
+
+    double maxAmount;
+    double minAmount;
+    string name;
+    string scope;
+    string startDate;
+    string status;
+    string type;
+    string updatedAt;
+    double value;
+
+}
+
+}

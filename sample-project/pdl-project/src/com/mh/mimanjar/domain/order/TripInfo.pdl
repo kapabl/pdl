@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+
+public class TripInfo
+{
+    int distance;
+    string duration;
+    bool succeed;
+}
+}

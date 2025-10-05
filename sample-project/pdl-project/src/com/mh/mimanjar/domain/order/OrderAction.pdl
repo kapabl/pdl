@@ -1,0 +1,26 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class OrderAction
+{
+    string name;
+    string fromState;
+    string toState;
+    string description;
+    string actionTitle;
+    string isMain;
+
+    string reasonType;
+    string[][] reasons;
+    string reasonTitle;
+
+    string reason;
+    string otherReason;
+
+    string eventSource;
+
+    string courierUuid;
+
+    int extraPreparationTime;
+}
+}

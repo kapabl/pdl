@@ -1,0 +1,24 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class OrderState
+{
+
+    const string Placed = "placed";
+    const string Confirmed = "confirmed";
+    const string Preparing = "preparing";
+    const string Canceled = "canceled";
+    const string Paid = "paid";
+    const string PayConfirmed = "payConfirmed";
+    const string Ready = "ready";
+    const string PickedByCourier = "pickedByCourier";
+    const string OnTheWay = "onTheWay";
+    const string Refund = "refund";
+    const string DepositPaid = "depositPaid";
+    const string DepositConfirmed = "depositConfirmed";
+    const string Delivered = "delivered";
+    const string Picked = "picked";
+    const string Completed = "completed";
+
+}
+}

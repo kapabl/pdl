@@ -1,0 +1,15 @@
+namespace com.mh.mimanjar.domain.order.myorders
+{
+
+using com.mh.mimanjar.domain.order.OrderModel;
+using com.mh.mimanjar.domain.order.OrderHeaderRowBase;
+
+public class MyOrderRowModel:  OrderHeaderRowBase
+{
+    int totalUser;
+    [jstype("StoreModel")]
+    public property object storeModel;
+    OrderModel orderModel;
+
+}
+}

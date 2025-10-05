@@ -1,0 +1,9 @@
+namespace com.mh.mimanjar.domain.discounts
+{
+public class DiscountCalculatedColumns
+{
+    const string EditableMinAmount = "editableMinAmount";
+    const string EditableMaxAmount = "editableMaxAmount";
+
+}
+}

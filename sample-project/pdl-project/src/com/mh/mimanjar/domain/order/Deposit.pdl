@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class Deposit
+{
+    bool hasDeposit;
+    int amount;
+
+}
+}

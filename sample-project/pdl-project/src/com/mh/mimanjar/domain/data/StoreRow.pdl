@@ -1,0 +1,49 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class StoreRow: Row
+{
+    string businessHours;
+    string businessPhone;
+    string businessPhoto;
+    string categories;
+    string createdAt;
+    string currency;
+    string datetimeZone;
+    int deliveryAddressId;
+    int deliveryCost;
+    string deliveryOptions;
+    string deliveryTimeframeOptions;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property int id;
+
+    string isAcceptingOrders;
+    string isOpen;
+    string isPublished;
+    string locale;
+    string name;
+    string orderStateConfig;
+    string paymentOptions;
+    int pickupAddressId;
+    string serviceFeeOptions;
+    string slogan;
+    string slug;
+    string status;
+    string updatedAt;
+    int userId;
+    string uuid;
+
+}
+
+}

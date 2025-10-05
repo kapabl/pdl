@@ -1,0 +1,13 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+using com.mh.mimanjar.domain.data.AddressRow;
+
+public class DeliveryMethod
+{
+    string method;
+    AddressRow pickupAddress;
+    AddressRow deliveryAddress;
+
+}
+}

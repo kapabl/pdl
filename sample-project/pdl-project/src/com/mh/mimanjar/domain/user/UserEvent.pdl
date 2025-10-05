@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.user
+{
+
+using com.mh.mimanjar.domain.comm.CommEvent;
+
+public class UserEvent: CommEvent
+{
+}
+
+}

@@ -1,0 +1,8 @@
+namespace com.mh.mimanjar.domain.discounts
+{
+public class DiscountTargets
+{
+    const string Store = "store";
+    const string Product = "product";
+}
+}

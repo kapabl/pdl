@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.seller.store
+{
+
+using com.mh.mimanjar.domain.comm.CommEvent;
+
+public class StoreEvent: CommEvent
+{
+}
+
+}

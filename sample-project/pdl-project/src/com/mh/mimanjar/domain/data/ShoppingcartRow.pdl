@@ -1,0 +1,30 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class ShoppingcartRow: Row
+{
+    string content;
+    string createdAt;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property string identifier;
+
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property string instance;
+
+    string updatedAt;
+
+}
+
+}

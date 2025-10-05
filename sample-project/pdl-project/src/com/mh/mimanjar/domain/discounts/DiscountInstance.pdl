@@ -1,0 +1,15 @@
+namespace com.mh.mimanjar.domain.discounts
+{
+public class DiscountInstance
+{
+    string startDate;
+    string endDate;
+    int duration;
+    double percentageValue;
+    int amountValue;
+
+    int minAmount;
+    int maxAmount;
+
+}
+}

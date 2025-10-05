@@ -1,0 +1,22 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+using com.mh.mimanjar.domain.data.NotificationRow;
+
+public class OrderHeaderRowBase
+{
+    int id;
+    int userId;
+    string courierUuid;
+    string orderId;
+    int userFirstName;
+    string humanOrderId;
+    int itemQuantity;
+    string state;
+    bool hasDeposit;
+    bool isDelivery;
+    bool isScheduled;
+    bool isPaid;
+    bool isPayConfirmed;
+}
+}

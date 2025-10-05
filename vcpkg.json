@@ -1,0 +1,20 @@
+{
+  "name": "pdlc",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "boost-algorithm",
+    "boost-date-time",
+    "boost-filesystem",
+    "boost-format",
+    "boost-fusion",
+    "boost-lexical-cast",
+    "boost-mpl",
+    "boost-optional",
+    "boost-phoenix",
+    "boost-smart-ptr",
+    "boost-spirit",
+    "boost-type-traits",
+    "boost-variant",
+    "cpprestsdk"
+  ]
+}

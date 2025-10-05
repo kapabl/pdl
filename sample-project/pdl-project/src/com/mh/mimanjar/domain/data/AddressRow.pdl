@@ -1,0 +1,46 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class AddressRow: Row
+{
+
+    [com.mh.ds.infrastructure.data.attributes.ColumnName("address1")]
+    public property string address1;
+
+
+    [com.mh.ds.infrastructure.data.attributes.ColumnName("address2")]
+    public property string address2;
+
+    string city;
+    string country;
+    string createdAt;
+    string defaultDelivery;
+    string defaultPickup;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property int id;
+
+    string isTest;
+    double lat;
+    double lon;
+    string name;
+    string phone;
+    string state;
+    string status;
+    string updatedAt;
+    int userId;
+    string zipcode;
+
+}
+
+}

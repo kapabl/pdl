@@ -1,0 +1,11 @@
+# Unnecessary exclusions requested
+*.tmp
+*.bak
+Thumbs.db
+.DS_Store
+logs/
+temp/
+tmp/
+build/
+vcpkg/
+vcpkg_installed/

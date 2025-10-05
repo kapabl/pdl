@@ -1,0 +1,53 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+using com.mh.mimanjar.domain.cart.CartItem;
+
+using com.mh.mimanjar.domain.order.DeliveryMethod;
+using com.mh.mimanjar.domain.order.DeliveryTime;
+using com.mh.mimanjar.domain.order.Deposit;
+using com.mh.mimanjar.domain.order.Payment;
+using com.mh.mimanjar.domain.order.Taxes;
+using com.mh.mimanjar.domain.order.ServiceFee;
+using com.mh.mimanjar.domain.order.DeliveryFee;
+using com.mh.mimanjar.domain.order.Discount;
+using com.mh.mimanjar.domain.order.Tip;
+using com.mh.mimanjar.domain.order.OrderEvent;
+using com.mh.mimanjar.domain.order.TripInfo;
+
+public class OrderModel
+{
+    string orderId;
+    string humanOrderId;
+    string status;
+    string storeId;
+    string userFirstName;
+
+    string source;
+
+    CartItem[] items;
+    DeliveryMethod deliveryMethod;
+    DeliveryTime deliveryTime;
+    Deposit deposit;
+    Payment payment;
+    Taxes taxes;
+    ServiceFee serviceFee;
+    DeliveryFee deliveryFee;
+    TripInfo tripInfo;
+    Discount[] discounts;
+    string[] discountCodes;
+    Tip tip;
+    OrderEvent[] orderEvents;
+    int subTotal;
+    int total;
+    int taxAmount;
+    int discountAmount;
+    int sellerTaxAmount;
+    int sellerTotal;
+    int deliveryTaxAmount;
+
+    int preparationTime;
+    string[] timeEstimatorMessages;
+    int remainingTime;
+}
+}

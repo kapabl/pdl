@@ -1,0 +1,13 @@
+namespace com.mh.mimanjar.infrastructure.pusher
+{
+
+public class PusherConfig
+{
+    string appId;
+    string appKey;
+    string appPath;
+    string cluster;
+
+}
+}
+

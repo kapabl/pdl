@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.notifications
+{
+
+public class NotificationTypes
+{
+    const string Order = "order";
+    const string Store = "store";
+    const string Chat = "chat";
+
+}
+}

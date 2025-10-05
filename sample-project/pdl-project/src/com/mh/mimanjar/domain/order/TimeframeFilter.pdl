@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+
+public class TimeframeFilter
+{
+    string value;
+    string title;
+    bool selected;
+}
+}

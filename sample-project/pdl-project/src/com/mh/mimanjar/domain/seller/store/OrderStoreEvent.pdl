@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.seller.store
+{
+
+using com.mh.mimanjar.domain.seller.store.StoreEvent;
+
+public class OrderStoreEvent: StoreEvent
+{
+    string orderId;
+}
+}

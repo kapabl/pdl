@@ -1,0 +1,13 @@
+namespace com.mh.mimanjar.domain
+{
+public class TimeframeTypes
+{
+    const string YearBack = "yearBack";
+    const string ThisYear = "thisYear";
+    const string ThreeMonths = "threeMonths";
+    const string ThisWeek = "thisWeek";
+    const string ThisMonth = "thisMonth";
+    const string ThirtyDaysBack = "thirtyDaysBack";
+
+}
+}

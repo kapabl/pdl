@@ -1,0 +1,28 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class OrderTransitions
+{
+
+    const string Confirm = "confirm";
+    const string Cancel = "cancel";
+    const string Preparing = "preparing";
+    const string Pay = "pay";
+    const string FlexiblePay = "flexiblePay";
+    const string FlexiblePayConfirm = "flexiblePayConfirm";
+    const string ConfirmPayment = "confirmPayment";
+    const string PayDeposit = "payDeposit";
+    const string ConfirmDeposit = "confirmDeposit";
+    const string Ready = "ready";
+    const string AssignToCourier = "assignToCourier";
+    const string ReAssignToCourier = "reAssignToCourier";
+    const string PickByCourier = "pickByCourier";
+    const string OnTheWay = "onTheWay";
+    const string Delivered = "delivered";
+    const string Picked = "picked";
+    const string Refund = "refund";
+    const string Complete = "complete";
+    const string AddPreparationTime = "addPreparationTime";
+
+}
+}

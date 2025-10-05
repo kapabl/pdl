@@ -1,0 +1,12 @@
+namespace com.mh.mimanjar.domain.discounts
+{
+public class DiscountScopes
+{
+    const string Global = "global";
+    const string Regional = "regional";
+    const string VipMember = "vip";
+    const string PassMember = "pass";
+    const string Coupon = "coupon";
+
+}
+}

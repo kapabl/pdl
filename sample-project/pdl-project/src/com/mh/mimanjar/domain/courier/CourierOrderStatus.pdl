@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.courier
+{
+
+public class CourierOrderStatus
+{
+    const string Assigned = "assigned";
+    const string ReAssigned = "re-assigned";
+    const string Delivered = "delivered";
+}
+}

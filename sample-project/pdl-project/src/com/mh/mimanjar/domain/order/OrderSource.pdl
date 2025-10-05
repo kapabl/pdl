@@ -1,0 +1,12 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class OrderSource
+{
+
+    const string Marketplace = "marketplace";
+    const string StoreWebsite = "storeWebsite";
+
+
+}
+}

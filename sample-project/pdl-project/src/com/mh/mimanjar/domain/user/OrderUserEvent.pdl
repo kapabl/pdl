@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.user
+{
+
+using com.mh.mimanjar.domain.user.UserEvent;
+
+public class OrderUserEvent: UserEvent
+{
+    string orderId;
+}
+}

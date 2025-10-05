@@ -1,0 +1,12 @@
+namespace com.mh.mimanjar.domain.categories
+{
+
+using com.mh.mimanjar.domain.data.CategoryRow;
+
+public class StoreCategoriesModel
+{
+    int storeId;
+    CategoryRow[] categoryModels;
+}
+
+}

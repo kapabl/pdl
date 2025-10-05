@@ -1,0 +1,17 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class Discount
+{
+    string name;
+    string code;
+
+    /* this could be like the valid time range of the discount, or a description */
+    string information;
+
+    int amount;
+
+    bool isValid;
+    string message;
+}
+}

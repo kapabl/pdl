@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.products
+{
+public class ProductCalculatedColumns
+{
+    const string EditablePrice = "editablePrice";
+    const string ImageUrls = "imageUrls";
+    const string DepositModel = "depositModel";
+    const string CategoryRows = "categoryRows";
+
+}
+}

@@ -1,0 +1,16 @@
+namespace com.mh.mimanjar.domain.seller
+{
+public class StoreCalculatedColumns
+{
+    const string BusinessPhotoUrl = "businessPhotoUrl";
+    const string DeliveryModel = "deliveryModel";
+    const string PaymentModel = "paymentModel";
+    const string Owner = "owner";
+    const string PickupAddress = "pickupAddress";
+    const string DeliveryTimeframeModel = "deliveryTimeframeModel";
+    const string CategoriesModel = "categoriesModel";
+    const string DiscountsModel = "discountsModel";
+    const string ServiceFeeModel = "serviceFeeModel";
+
+}
+}

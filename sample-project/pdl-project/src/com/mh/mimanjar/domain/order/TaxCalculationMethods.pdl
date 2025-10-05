@@ -1,0 +1,9 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class TaxCalculationMethods
+{
+    const string OnlySubtotal = "onlySubtotal";
+    const string SubtotalAndDelivery = "subtotalAndDelivery";
+}
+}

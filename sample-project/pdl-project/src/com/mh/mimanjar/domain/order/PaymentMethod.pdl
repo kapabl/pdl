@@ -1,0 +1,9 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class PaymentMethod
+{
+    string name;
+    bool selected;
+}
+}

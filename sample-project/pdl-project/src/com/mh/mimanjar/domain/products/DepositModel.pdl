@@ -1,0 +1,14 @@
+namespace com.mh.mimanjar.domain.products
+{
+
+
+
+public class DepositModel
+{
+    bool requiresDeposit;
+    int depositAmount;
+    double editableDepositAmount;
+    double depositPercentage;
+}
+
+}

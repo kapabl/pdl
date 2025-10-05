@@ -1,0 +1,38 @@
+
+
+namespace x.y.z
+{
+ 
+    using  pam.pam.pepe;
+    using  pam.pam.juan;
+    using  pam.pam.john;
+    /*
+    using pam.properties.attributes.attr1;
+    using pam.properties.attributes.spinner;
+    */
+    
+    
+    public class Item : pam.pam.pepe
+    {
+        
+        [pam.properties.attributes.attr1]
+        [pam.properties.attributes.attr1(10,true,"a\"aa",min=true)]
+        [pam.properties.attributes.attr1(20,true,"aaa")]
+        [pam.properties.attributes.spinner(min=1,max=1000)]
+        public property Item1 title;
+        public property string Item[ int index ];
+
+        public method int run( int index, Item1 name, double name1 );
+    }
+
+    
+    public class Item1
+    {
+        public property read string Name[ int index ];
+    }
+    
+
+}
+
+
+    

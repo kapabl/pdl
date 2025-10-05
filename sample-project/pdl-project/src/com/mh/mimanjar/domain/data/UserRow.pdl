@@ -1,0 +1,55 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class UserRow: Row
+{
+    string canSell;
+    string cashAppId;
+    string createdAt;
+    int currentTeamId;
+    string datetimeZone;
+    int deliveryAddressId;
+    string email;
+    string emailVerifiedAt;
+    string facebookId;
+    string googleId;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property int id;
+
+    string isAvailable;
+    string isSystemAdmin;
+    string isTestUser;
+    string lastLocation;
+    string lastLocationTime;
+    string locale;
+    string name;
+    string password;
+    string phone;
+    string profilePhotoPath;
+    string rememberToken;
+    string role;
+    string status;
+    int storeId;
+    string testSeller;
+    string travelMode;
+    string twoFactorRecoveryCodes;
+    string twoFactorSecret;
+    string updatedAt;
+    string uuid;
+    string zelleEmail;
+    string zellePhone;
+
+}
+
+}

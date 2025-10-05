@@ -1,0 +1,9 @@
+namespace com.mh.mimanjar.domain.seller
+{
+
+public class DeliveryBracket
+{
+    int distance;
+    int price;
+}
+}

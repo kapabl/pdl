@@ -1,0 +1,9 @@
+namespace com.mh.mimanjar.domain.categories
+{
+
+public class CategoryCalculatedColumns
+{
+    const string ProductModels = "productModels";
+}
+
+}

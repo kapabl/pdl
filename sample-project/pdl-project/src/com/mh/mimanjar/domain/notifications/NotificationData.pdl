@@ -1,0 +1,23 @@
+namespace com.mh.mimanjar.domain.notifications
+{
+
+
+public class NotificationData
+{
+    string orderId;
+    string humanOrderId;
+    string datetimeZone;
+    string fromName;
+    string toName;
+    string amount;
+    string formattedAmount;
+    string locale;
+    string currency;
+    string courierUuid;
+    string courierName;
+    string prevCourierUuid;
+    string prevCourierName;
+    string reason;
+    string reasonMessage;
+}
+}

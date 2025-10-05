@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.comm
+{
+
+public class CommEvent
+{
+    string dateTime;
+    string description;
+    string eventSource;
+    string name;
+}
+}

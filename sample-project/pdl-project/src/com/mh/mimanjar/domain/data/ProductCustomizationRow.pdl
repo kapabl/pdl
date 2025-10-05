@@ -1,0 +1,40 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class ProductCustomizationRow: Row
+{
+    string createdAt;
+    string defaultValue;
+    string description;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property int id;
+
+    string isOption;
+    string isSoldOut;
+    int maxQuantity;
+    int minQuantity;
+    string name;
+    string nutritionalInfo;
+    int pickupPrice;
+    int price;
+    string showInOrder;
+    string status;
+    string type;
+    string updatedAt;
+    int userId;
+    string uuid;
+
+}
+
+}

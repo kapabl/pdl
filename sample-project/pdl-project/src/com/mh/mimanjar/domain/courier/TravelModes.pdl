@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.courier
+{
+public class TravelModes
+{
+     const string Driving = "DRIVING";
+     const string Walking = "WALKING";
+     const string Transit = "TRANSIT";
+     const string Bicycling = "BICYCLING";
+}
+}

@@ -1,0 +1,42 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class OrgOrderRow: Row
+{
+    string billingAddress;
+    string billingCity;
+    int billingDiscount;
+    string billingDiscountCode;
+    string billingEmail;
+    string billingName;
+    string billingNameOnCard;
+    string billingPhone;
+    string billingPostalcode;
+    string billingProvince;
+    int billingSubtotal;
+    int billingTax;
+    int billingTotal;
+    string createdAt;
+    string error;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property int id;
+
+    string paymentGateway;
+    int shipped;
+    string updatedAt;
+    int userId;
+
+}
+
+}

@@ -1,0 +1,13 @@
+namespace com.mh.mimanjar.domain.courier
+{
+
+using com.mh.mimanjar.domain.user.UserEvent;
+using com.mh.mimanjar.domain.courier.LastLocationModel;
+
+public class CourierUserEvent: UserEvent
+{
+    string orderId;
+    string courierId;
+    LastLocationModel lastLocationModel;
+}
+}

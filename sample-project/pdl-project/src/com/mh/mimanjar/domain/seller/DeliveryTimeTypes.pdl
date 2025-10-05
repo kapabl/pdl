@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.seller
+{
+public class DeliveryTimeTypes
+{
+    const string Schedule = "schedule";
+    const string Now = "now";
+    const string ToBeDetermine = "tbd";
+
+}
+}

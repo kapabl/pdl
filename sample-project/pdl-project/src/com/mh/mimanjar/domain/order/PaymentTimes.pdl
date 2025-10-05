@@ -1,0 +1,12 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class PaymentTimes
+{
+    const string AtDelivery = "AtDelivery";
+    const string AtPickup = "AtPickup";
+    const string AnyTime = "AnyTime";
+    const string AfterConfirm = "AfterConfirm";
+
+}
+}

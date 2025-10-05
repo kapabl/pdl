@@ -1,0 +1,9 @@
+namespace com.mh.mimanjar.domain.seller
+{
+public class DeliveryMethods
+{
+    const string Delivery = "delivery";
+    const string Pickup = "pickup";
+
+}
+}

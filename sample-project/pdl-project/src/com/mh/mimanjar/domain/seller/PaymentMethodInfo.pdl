@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.seller
+{
+public class PaymentMethodInfo
+{
+    string title;
+    string value;
+    string icon;
+    bool accepted;
+    bool selected;
+}
+}

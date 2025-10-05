@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class Taxes
+{
+    bool acceptSaleTax;
+    double taxRate;
+    string calculationMethod;
+}
+}

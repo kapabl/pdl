@@ -1,0 +1,17 @@
+namespace com.mh.mimanjar.domain.courier
+{
+
+using com.mh.mimanjar.domain.courier.RouteOptions;
+
+public class CourierDetailsModel
+{
+    string travelMode;
+    string make;
+    string model;
+    string year;
+    string plate;
+    string color;
+
+    RouteOptions routeOptions;
+}
+}

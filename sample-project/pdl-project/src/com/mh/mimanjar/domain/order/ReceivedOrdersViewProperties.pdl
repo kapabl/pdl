@@ -1,0 +1,21 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+using com.mh.mimanjar.domain.seller.PaymentMethodInfo;
+using com.mh.mimanjar.domain.order.Filter;
+using com.mh.mimanjar.domain.order.TimeframeFilter;
+using com.mh.mimanjar.domain.order.CustomerFilter;
+using com.mh.mimanjar.infrastructure.pusher.PusherConfig;
+using com.mh.mimanjar.domain.order.CommonOrderProperties;
+
+public class ReceivedOrdersViewProperties: CommonOrderProperties
+{
+    Filter[] filters;
+    CustomerFilter[] customerFilters;
+    string timeframe;
+    int filterVersion;
+    string preselectOrderId;
+    bool notificationsMode;
+    TimeframeFilter[] timeframeFilters;
+}
+}

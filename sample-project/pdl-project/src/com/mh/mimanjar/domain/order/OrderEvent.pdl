@@ -1,0 +1,25 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class OrderEvent
+{
+    string transitionName;
+    string dateTime;
+    string description;
+    string eventSource;
+    string state;
+    string fromState;
+
+    /** eg of event message: user payment method info like cashapp user or zelle */
+    string eventMessage;
+
+    string reasonType;
+    string reason;
+    string otherReason;
+
+    string courierUuid;
+
+    int extraPreparationTime;
+
+}
+}

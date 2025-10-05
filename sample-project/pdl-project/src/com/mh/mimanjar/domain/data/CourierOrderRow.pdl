@@ -1,0 +1,28 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class CourierOrderRow: Row
+{
+    string courierUuid;
+    string createdAt;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property int id;
+
+    int orderId;
+    string status;
+    string updatedAt;
+
+}
+
+}

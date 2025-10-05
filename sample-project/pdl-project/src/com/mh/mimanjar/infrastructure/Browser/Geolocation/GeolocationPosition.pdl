@@ -1,0 +1,14 @@
+namespace com.mh.mimanjar.infrastructure.browser.geolocation
+{
+
+using com.mh.mimanjar.infrastructure.browser.geolocation.GeolocationCoordinates;
+
+public class GeolocationPosition
+{
+
+    GeolocationCoordinates coords;
+    string timestamp;
+
+}
+}
+

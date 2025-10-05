@@ -1,0 +1,15 @@
+namespace com.mh.mimanjar.infrastructure.browser.geolocation
+{
+
+public class GeolocationCoordinates
+{
+    double latitude;
+    double longitude;
+    double altitude;
+    double accuracy;
+    double altitudeAccuracy;
+    double heading;
+    double speed;
+}
+}
+

@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.products
+{
+public class CustomizationTypes
+{
+    const string SingleSelection = "singleSelection";
+    const string MultiSelection = "multiSelection";
+    const string QuantitySelection  = "quantitySelection";
+    const string SimpleList  = "simpleList";
+    const string Simple  = "simple";
+}
+}

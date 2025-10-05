@@ -1,0 +1,14 @@
+namespace com.mh.mimanjar.domain.products
+{
+
+using com.mh.mimanjar.domain.data.ProductCustomizationRow;
+
+public class CustomizationNode
+{
+    int nodeId;
+    int position;
+    ProductCustomizationRow customization;
+    CustomizationNode[] subCustomization;
+}
+
+}

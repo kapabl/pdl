@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.courier
+{
+
+
+public class RouteOptions
+{
+    bool avoidFerries;
+    bool avoidHighways;
+    bool avoidTolls;
+}
+}

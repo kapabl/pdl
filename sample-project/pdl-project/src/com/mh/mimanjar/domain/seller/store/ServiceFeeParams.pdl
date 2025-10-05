@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.seller.store
+{
+public class ServiceFeeParams
+{
+    string name;
+    int minimum;
+    int maximum;
+    double orderPercentage;
+    bool enabled;
+}
+}

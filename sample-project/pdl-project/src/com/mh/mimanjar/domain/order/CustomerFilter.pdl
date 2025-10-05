@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+
+public class CustomerFilter
+{
+    int userId;
+    string name;
+    bool selected;
+}
+}

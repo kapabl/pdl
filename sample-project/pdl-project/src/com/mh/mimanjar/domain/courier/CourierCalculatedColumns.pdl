@@ -1,0 +1,9 @@
+namespace com.mh.mimanjar.domain.courier
+{
+public class CourierCalculatedColumns
+{
+     const string OpenOrders = "openOrders";
+     const string LastLocationModel = "lastLocationModel";
+
+}
+}

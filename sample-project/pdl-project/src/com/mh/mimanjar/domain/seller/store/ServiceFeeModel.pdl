@@ -1,0 +1,12 @@
+namespace com.mh.mimanjar.domain.seller.store
+{
+
+using com.mh.mimanjar.domain.seller.store.ServiceFeeParams;
+
+public class ServiceFeeModel
+{
+    ServiceFeeParams marketplaceParams;
+    ServiceFeeParams standaloneParams;
+    double standaloneShare;
+}
+}

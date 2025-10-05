@@ -1,0 +1,16 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+using com.mh.mimanjar.domain.data.NotificationRow;
+using com.mh.mimanjar.domain.order.OrderHeaderRowBase;
+
+public class OrderHeaderRow: OrderHeaderRowBase
+{
+    int totalStore;
+    string[] stateHistory;
+    NotificationRow[] pendingNotifications;
+    bool isIncoming;
+    bool isUpdated;
+
+}
+}

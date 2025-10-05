@@ -1,0 +1,12 @@
+namespace com.mh.mimanjar.domain.user
+{
+public class Roles
+{
+    const string Admin = "admin";
+    const string Operator = "operator";
+    const string Courier = "courier";
+    const string MMAdmin = "mmadmin";
+
+
+}
+}

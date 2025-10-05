@@ -1,0 +1,12 @@
+namespace com.mh.mimanjar.domain.seller
+{
+public class PaymentMethods
+{
+    const string Zelle = "zelle";
+    const string Cashapp = "cashApp";
+    const string Card = "card";
+    const string Cash = "cash";
+    const string Paypal = "paypal";
+
+}
+}

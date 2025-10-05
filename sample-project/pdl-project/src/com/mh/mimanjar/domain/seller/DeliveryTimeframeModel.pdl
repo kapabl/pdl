@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.seller
+{
+public class DeliveryTimeframeModel
+{
+    bool acceptNowOrders;
+    bool acceptScheduledOrders;
+    string preparationTime;
+    bool acceptTbdOrders;
+
+}
+}

@@ -1,0 +1,32 @@
+namespace com.mh.mimanjar.domain.seller
+{
+
+using com.mh.mimanjar.domain.seller.TipBracket;
+
+public class PaymentOptions
+{
+    bool acceptZelle;
+    string zellePhone;
+    string zelleEmail;
+
+    bool acceptCashApp;
+    string cashAppId;
+
+    bool acceptCreditCard;
+
+    bool acceptCash;
+
+    bool acceptAtDelivery;
+    bool acceptAtPickup;
+    bool acceptBeforeCompleting;
+    bool anyTime;
+
+    bool acceptTip;
+
+    TipBracket[] tipBrackets;
+
+    bool acceptSaleTax;
+    double saleTaxRate;
+
+}
+}

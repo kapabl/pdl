@@ -1,0 +1,12 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class UserCancelReasonTypes
+{
+    const string Other = "other";
+    const string WrongDeliveryAddress = "wrongDeliveryAddress";
+    const string OrderByMistake = "orderByMistake";
+
+
+}
+}

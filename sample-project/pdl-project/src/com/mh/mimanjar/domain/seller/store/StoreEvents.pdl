@@ -1,0 +1,21 @@
+namespace com.mh.mimanjar.domain.seller.store
+{
+
+public class StoreEvents
+{
+    const string NewOrder = "newOrder";
+    const string OrderConfirmed = "orderConfirmed";
+    const string OrderPaid = "orderPaid";
+    const string OrderReady = "orderReady";
+    const string PaymentConfirmed = "paymentConfirmed";
+    const string OrderPreparing = "orderPreparing";
+    const string DepositPaid = "depositPaid";
+    const string DepositConfirmed = "depositConfirmed";
+    const string OrderCancelled = "orderCancelled";
+    const string StoreOrderCancelled = "storeOrderCancelled";
+    const string OrderDelivered = "orderDelivered";
+    const string OrderPicked = "orderPicked";
+    const string OrderOnTheWay = "orderOnTheWay";
+
+}
+}

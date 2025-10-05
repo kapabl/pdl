@@ -1,0 +1,16 @@
+namespace com.mh.mimanjar.domain.cart
+{
+
+using com.mh.mimanjar.domain.products.selection.ProductSelectionModel;
+using com.mh.mimanjar.domain.data.ProductRow;
+
+public class CartItemOptions
+{
+    ProductSelectionModel selectionModel;
+
+    [jstype("ProductModel|ProductRow")]
+    public property ProductRow productModel;
+
+}
+
+}

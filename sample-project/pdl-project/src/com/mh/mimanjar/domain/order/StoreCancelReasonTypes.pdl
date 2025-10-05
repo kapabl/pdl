@@ -1,0 +1,14 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class StoreCancelReasonTypes
+{
+    const string Other = "other";
+    const string ItemsNotAvailable = "itemsNotAvailable";
+    const string StoreClosed = "storeClosed";
+    const string HighVolumeOfOrders = "highVolumeOfOrders";
+    const string CantProcessOrderNow = "cantProcessOrderNow";
+    const string CantDeliver = "cantDeliver";
+
+}
+}

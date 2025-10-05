@@ -1,0 +1,9 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class Tip
+{
+    bool hasTip;
+    int amount;
+}
+}

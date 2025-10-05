@@ -1,0 +1,13 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+using com.mh.mimanjar.domain.data.AddressRow;
+using com.mh.mimanjar.domain.order.Payment;
+
+public class ZellePayment: Payment
+{
+    string email;
+    string phone;
+}
+
+}

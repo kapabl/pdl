@@ -1,0 +1,14 @@
+namespace com.mh.mimanjar.domain.notifications
+{
+
+
+public class NotificationModel
+{
+    int id;
+    string imageUrl;
+    string message;
+    string destinationUrl;
+    string dateTime;
+    string unread;
+}
+}

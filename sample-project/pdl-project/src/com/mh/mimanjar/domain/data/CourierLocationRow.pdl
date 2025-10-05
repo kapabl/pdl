@@ -1,0 +1,37 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class CourierLocationRow: Row
+{
+    double accuracy;
+    double altitude;
+    double altitudeAccuracy;
+    string courierUuid;
+    double heading;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property int id;
+
+    string isValidAccuracy;
+    double lat;
+    string locationTime;
+    double lon;
+    string needsSnapToRoad;
+    double snapToRoadLat;
+    double snapToRoadLon;
+    string snapToRoadSucceed;
+    double speed;
+
+}
+
+}

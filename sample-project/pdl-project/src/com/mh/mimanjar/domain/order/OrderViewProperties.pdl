@@ -1,0 +1,26 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+using com.mh.mimanjar.domain.order.OrderModel;
+using com.mh.mimanjar.domain.order.OrderAction;
+using com.mh.mimanjar.domain.data.OrderRow;
+using com.mh.mimanjar.domain.data.UserRow;
+using com.mh.mimanjar.domain.seller.PaymentMethodInfo;
+using com.mh.mimanjar.infrastructure.pusher.PusherConfig;
+using com.mh.mimanjar.domain.order.CommonOrderProperties;
+
+public class OrderViewProperties: CommonOrderProperties
+{
+    OrderModel orderModel;
+    OrderRow orderRow;
+    OrderAction[] orderActions;
+    string message;
+    PaymentMethodInfo paymentMethodInfo;
+    string eventSource;
+    bool hasCourier;
+    UserRow courierUserRow;
+
+    string deliveryDateTime;
+    string deliveryDateTimeMessage;
+}
+}

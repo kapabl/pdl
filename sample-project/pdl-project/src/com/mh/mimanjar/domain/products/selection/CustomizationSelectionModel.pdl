@@ -1,0 +1,17 @@
+namespace com.mh.mimanjar.domain.products.selection
+{
+
+
+public class CustomizationSelectionModel
+{
+    int nodeId;
+    string name;
+    int customizationId;
+    int quantity;
+    int price;
+    int unitPrice;
+    string type;
+    CustomizationSelectionModel[] customizations;
+}
+
+}

@@ -1,0 +1,24 @@
+namespace com.mh.mimanjar.domain.cart
+{
+
+using com.mh.ds.domain.components.properties.attributes.jstype;
+using com.mh.mimanjar.domain.cart.CartItemOptions;
+
+public class CartItem
+{
+    [jstype("int|string")]
+    public property object id;
+
+    [jstype("int|string")]
+    public property object rowId;
+
+    string name;
+    bool isSave;
+    CartItemOptions options;
+    double price;
+    double qty;
+    double taxRate;
+
+}
+
+}

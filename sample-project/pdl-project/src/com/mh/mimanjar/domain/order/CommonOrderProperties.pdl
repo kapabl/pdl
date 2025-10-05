@@ -1,0 +1,18 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+using com.mh.mimanjar.domain.order.OrderModel;
+using com.mh.mimanjar.domain.order.OrderAction;
+using com.mh.mimanjar.domain.data.OrderRow;
+using com.mh.mimanjar.domain.seller.PaymentMethodInfo;
+using com.mh.mimanjar.infrastructure.pusher.PusherConfig;
+
+public class CommonOrderProperties
+{
+    [jstype("StoreModel")]
+    public property object storeModel;
+
+    int priceDetailLevel;
+    object localization;
+}
+}

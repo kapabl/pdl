@@ -1,0 +1,10 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class DeliveryTime
+{
+    string type;
+    string preparationTime;
+    string datetime;
+}
+}

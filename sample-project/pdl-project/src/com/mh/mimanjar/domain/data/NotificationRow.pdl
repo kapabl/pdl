@@ -1,0 +1,41 @@
+/**
+ *  Minglehouse Generated File with Pdl
+ *  MiManjar
+ *  @version: 1.0.0
+ *
+ *
+ */
+
+namespace com.mh.mimanjar.domain.data
+{
+
+using com.mh.ds.infrastructure.data.Row;
+
+public class NotificationRow: Row
+{
+    string body;
+    string createdAt;
+    string data;
+    int fromStoreId;
+    int fromUserId;
+
+    [com.mh.ds.infrastructure.data.attributes.IsDbId]
+    public property int id;
+
+    string name;
+    string notificationTime;
+    string orderId;
+    string readTime;
+    string retrievedFirstTime;
+    string source;
+    string title;
+    int toStoreId;
+    int toUserId;
+    string type;
+    string unread;
+    string updatedAt;
+    string url;
+
+}
+
+}

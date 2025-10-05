@@ -1,0 +1,15 @@
+namespace com.mh.mimanjar.domain.courier
+{
+using com.mh.mimanjar.infrastructure.browser.geolocation.GeolocationPosition;
+public class LastLocationModel: GeolocationPosition
+{
+    double lat;
+    double lon;
+    double originalLat;
+    double originalLon;
+    bool snappedToRoad;
+    double distanceFromStore;
+    double timeFromStore;
+
+}
+}

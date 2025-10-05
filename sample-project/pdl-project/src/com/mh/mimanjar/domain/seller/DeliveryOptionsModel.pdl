@@ -1,0 +1,15 @@
+namespace com.mh.mimanjar.domain.seller
+{
+using com.mh.mimanjar.domain.seller.DeliveryBracket;
+
+public class DeliveryOptionsModel
+{
+    bool delivery;
+    bool pickup;
+    bool ownDelivery;
+    DeliveryBracket[] deliveryBrackets;
+    int walkingDistanceLimit;
+    int bicycleDistanceLimit;
+    int drivingDistanceLimit;
+}
+}

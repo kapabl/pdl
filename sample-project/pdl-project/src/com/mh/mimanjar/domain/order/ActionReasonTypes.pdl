@@ -1,0 +1,11 @@
+namespace com.mh.mimanjar.domain.order
+{
+
+public class ActionReasonTypes
+{
+    const string None = "none";
+    const string Required = "required";
+    const string Optional = "optional";
+
+}
+}
