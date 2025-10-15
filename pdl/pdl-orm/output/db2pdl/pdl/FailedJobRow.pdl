@@ -1,0 +1,17 @@
+namespace io.pdl.mimanjar.domain.data
+
+using {
+}
+
+class FailedJobRow
+[
+    connection: string
+    exception: string
+    failedAt: string
+    [io.pdl.ds.infrastructure.data.attributes.IsDbId]
+    id: int
+    payload: string
+    queue: string
+    uuid: string
+]
+

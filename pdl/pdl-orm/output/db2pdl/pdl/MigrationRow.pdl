@@ -1,0 +1,13 @@
+namespace io.pdl.mimanjar.domain.data
+
+using {
+}
+
+class MigrationRow
+[
+    batch: int
+    [io.pdl.ds.infrastructure.data.attributes.IsDbId]
+    id: int
+    migration: string
+]
+

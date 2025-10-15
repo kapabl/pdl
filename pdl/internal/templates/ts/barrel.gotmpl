@@ -1,0 +1,17 @@
+/**
+ *  {{ index . "companyName" }} Generated File with Pdl
+ *  {{ index . "project" }}
+ *  @version: {{ index . "version" }}
+ *
+ *   Barrel File for:
+{{- range $name, $class := index . "classes" }}
+{{- $node := index $class "ClassNode" }}
+ *       {{ index $node "FullName" }}
+{{- end }}
+ */
+
+{{- range $name, $class := index . "classes" }}
+{{- $node := index $class "ClassNode" }}
+{{- $fileInfo := index $node "FileInfo" }}
+export * from './{{ index $fileInfo "Name" }}';
+{{- end }}

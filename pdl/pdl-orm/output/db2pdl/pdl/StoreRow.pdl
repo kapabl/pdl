@@ -1,0 +1,37 @@
+namespace io.pdl.mimanjar.domain.data
+
+using {
+}
+
+class StoreRow
+[
+    businessHours: string
+    businessPhone: string
+    businessPhoto: string
+    categories: string
+    createdAt: string
+    currency: string
+    datetimeZone: string
+    deliveryAddressId: int
+    deliveryCost: int
+    deliveryOptions: string
+    deliveryTimeframeOptions: string
+    [io.pdl.ds.infrastructure.data.attributes.IsDbId]
+    id: int
+    isAcceptingOrders: string
+    isOpen: string
+    isPublished: string
+    locale: string
+    name: string
+    orderStateConfig: string
+    paymentOptions: string
+    pickupAddressId: int
+    serviceFeeOptions: string
+    slogan: string
+    slug: string
+    status: string
+    updatedAt: string
+    userId: int
+    uuid: string
+]
+

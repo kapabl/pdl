@@ -1,0 +1,30 @@
+namespace io.pdl.mimanjar.domain.data
+
+using {
+}
+
+class AddressRow
+[
+    [io.pdl.ds.infrastructure.data.attributes.ColumnName(&quot;{}&quot;)]
+    address1: string
+    [io.pdl.ds.infrastructure.data.attributes.ColumnName(&quot;{}&quot;)]
+    address2: string
+    city: string
+    country: string
+    createdAt: string
+    defaultDelivery: string
+    defaultPickup: string
+    [io.pdl.ds.infrastructure.data.attributes.IsDbId]
+    id: int
+    isTest: string
+    lat: double
+    lon: double
+    name: string
+    phone: string
+    state: string
+    status: string
+    updatedAt: string
+    userId: int
+    zipcode: string
+]
+

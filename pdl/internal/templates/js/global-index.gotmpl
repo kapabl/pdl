@@ -1,0 +1,27 @@
+/**
+ *  {{ index . "companyName" }} Generated File with Pdl
+ *  {{ index . "project" }}
+ *  @version: {{ index . "version" }}
+ *
+ *   Global Index
+ *
+ */
+
+{{- range $group := index . "globalIndexClasses" }}
+{{- range $class := index $group "Classes" }}
+{{- $node := index $class "ClassNode" }}
+require( './{{ index $node "Path" }}' );
+{{- end }}
+{{- end }}
+
+{{- range $group := index . "globalIndexClasses" }}
+module.exports.ns{{ index $group "Namespace" }} = {
+{{- range $class := index $group "Classes" }}
+{{- $node := index $class "ClassNode" }}
+    /** @type {{ braceWrap (index $node "FullName") }} */
+    {{ index $node "Name" }}: {{ index $node "FullName" }}{{ if not (index $class "Last") }},{{ end }}
+{{- end }}
+};
+
+{{- end }}
+

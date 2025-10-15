@@ -1,0 +1,27 @@
+namespace io.pdl.mimanjar.domain.data
+
+using {
+}
+
+class OrderRow
+[
+    courierUuid: string
+    createdAt: string
+    deliveryTaxAmount: int
+    discountAmount: int
+    [io.pdl.ds.infrastructure.data.attributes.IsDbId]
+    id: int
+    model: string
+    notes: string
+    orderId: string
+    sellerTaxAmount: int
+    sellerTotal: int
+    status: string
+    storeId: int
+    subTotal: int
+    taxAmount: int
+    total: int
+    updatedAt: string
+    userId: int
+]
+

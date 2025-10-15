@@ -1,0 +1,22 @@
+{{- $table := .Data }}
+export interface {{ $table.RowClass }} {
+{{- range $table.FieldsInfo }}
+  {{ .CamelCase }}: {{ .TsType }};
+{{- end }}
+}
+
+export const {{ $table.RowClass }}Table = "{{ $table.TableName }}" as const;
+
+export const {{ $table.RowClass }}Columns = {
+{{- range $table.FieldsInfo }}
+  {{ .CamelCase }}: "{{ .Original }}",
+{{- end }}
+} as const;
+
+export type {{ $table.RowClass }}Column = keyof typeof {{ $table.RowClass }}Columns;
+
+export const {{ $table.RowClass }}OrderBy = {
+{{- range $table.FieldsInfo }}
+  {{ .CamelCase }}: "{{ .Original }}",
+{{- end }}
+} as const;

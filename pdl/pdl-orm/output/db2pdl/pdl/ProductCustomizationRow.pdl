@@ -1,0 +1,28 @@
+namespace io.pdl.mimanjar.domain.data
+
+using {
+}
+
+class ProductCustomizationRow
+[
+    createdAt: string
+    defaultValue: string
+    description: string
+    [io.pdl.ds.infrastructure.data.attributes.IsDbId]
+    id: int
+    isOption: string
+    isSoldOut: string
+    maxQuantity: int
+    minQuantity: int
+    name: string
+    nutritionalInfo: string
+    pickupPrice: int
+    price: int
+    showInOrder: string
+    status: string
+    type: string
+    updatedAt: string
+    userId: int
+    uuid: string
+]
+

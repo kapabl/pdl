@@ -1,0 +1,20 @@
+<?php
+
+namespace Com\Mh\Mimanjar\Domain\Data;
+
+use Com\Mh\Ds\Infrastructure\Data\Db\Where;
+
+class CustomizationSearchWhere extends Where
+{
+    protected function setup()
+    {
+        $this->addField( 'created_at' );
+        $this->addField( 'customization_full_name' );
+        $this->addField( 'id' );
+        $this->addField( 'name' );
+        $this->addField( 'relation_id' );
+        $this->addField( 'updated_at' );
+        $this->addField( 'user_id' );
+    }
+}
+

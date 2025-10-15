@@ -1,0 +1,11 @@
+/**
+ *  {{ index . "companyName" }} Generated File with Pdl
+ *  {{ index . "project" }}
+ *  @version: {{ index . "version" }}
+ *
+ *      Index File
+ */
+
+import * as {{ index . "innerNamespace" }} from './{{ index . "barrelFilename" }}';
+
+export { {{ index . "innerNamespace" }} };

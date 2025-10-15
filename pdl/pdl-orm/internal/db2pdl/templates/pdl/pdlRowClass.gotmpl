@@ -1,0 +1,34 @@
+/**
+ *  {{ .CompanyName }} Generated File with Pdl
+ *  {{ .Project }}
+ *  @version: {{ .Version }}
+ *
+ *
+ */
+
+{{- with $table := .Data }}
+namespace {{ $table.PdlEntitiesNamespace }}
+{
+
+using io.pdl.infrastructure.data.Row;
+{{- range $table.PdlUseNamespaces }}
+using {{ . }};
+{{- end }}
+
+public class {{ $table.PdlRowClass }}: Row
+{
+{{- range $table.FieldsInfo }}
+{{- if .PdlAttributes }}
+
+    {{ .PdlAttributes }}
+    public property {{ .PdlType }} {{ .CamelCase }};
+
+{{- else }}
+    {{ .PdlType }} {{ .CamelCase }};
+{{- end }}
+{{- end }}
+
+}
+
+}
+{{- end }}

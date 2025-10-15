@@ -1,0 +1,138 @@
+{
+  "companyName": "Minglehouse",
+  "project": "MiManjar",
+  "version": "1.0.0",
+  "outputDir": "${PDL_OUTPUT}",
+  "verbose": false,
+  "templates": {
+    "dir": "${PDL_TEMPLATES_DIR}",
+    "name": "classTemplate1"
+  },
+  "db2pdl": {
+    "enabled": true,
+    "db2PdlSourceDest": "com/mh/mimanjar/domain/data"
+  },
+  "src": [
+    "src"
+  ],
+  "profiles": {
+    "kotlin": {
+      "enabled": true
+    },
+    "rust": {
+      "enabled": true
+    },
+    "cpp": {
+      "enabled": true
+    },
+    "ts": {
+      "enabled": true
+    },
+    "js": {
+      "enabled": true,
+      "generateAsObject": false,
+      "namespaceFile": "",
+      "useLet": true
+    },
+    "tsConsts": {
+      "enabled": true,
+      "language": "ts",
+      "templates": {
+        "dir": "${PDL_TEMPLATES_DIR}/js-object"
+      }
+    },
+    "go": {
+      "enabled": true
+    },
+    "php": {
+      "enabled": true
+    },
+    "csharp": {
+      "enabled": true
+    },
+    "java": {
+      "enabled": true
+    }
+  },
+  "sections": [
+    {
+      "name": "ConstFiles",
+      "files": {
+        "tsConsts": [
+          "com/mh/mimanjar/domain/products/CustomizationTypes.pdl",
+          "com/mh/mimanjar/domain/products/ProductCalculatedColumns.pdl",
+          "com/mh/mimanjar/domain/seller/DeliveryMethods.pdl",
+          "com/mh/mimanjar/domain/seller/StoreCalculatedColumns.pdl",
+          "com/mh/mimanjar/domain/seller/DeliveryTimeTypes.pdl",
+          "com/mh/mimanjar/domain/seller/PaymentMethods.pdl",
+          "com/mh/mimanjar/domain/seller/store/StoreEvents.pdl",
+          "com/mh/mimanjar/domain/TimeframeTypes.pdl",
+          "com/mh/mimanjar/domain/user/Roles.pdl",
+          "com/mh/mimanjar/domain/courier/TravelModes.pdl",
+          "com/mh/mimanjar/domain/courier/CourierOrderStatus.pdl",
+          "com/mh/mimanjar/domain/courier/CourierCalculatedColumns.pdl",
+          "com/mh/mimanjar/domain/order/OrderState.pdl",
+          "com/mh/mimanjar/domain/order/OrderTransitions.pdl",
+          "com/mh/mimanjar/domain/order/OrderSource.pdl",
+          "com/mh/mimanjar/domain/order/PaymentTimes.pdl",
+          "com/mh/mimanjar/domain/order/ActionReasonTypes.pdl",
+          "com/mh/mimanjar/domain/order/UserCancelReasonTypes.pdl",
+          "com/mh/mimanjar/domain/order/StoreCancelReasonTypes.pdl",
+          "com/mh/mimanjar/domain/order/OrderEventSource.pdl",
+          "com/mh/mimanjar/domain/order/TaxCalculationMethods.pdl",
+          "com/mh/mimanjar/domain/categories/CategoryCalculatedColumns.pdl",
+          "com/mh/mimanjar/domain/discounts/DiscountScopes.pdl",
+          "com/mh/mimanjar/domain/discounts/DiscountTypes.pdl",
+          "com/mh/mimanjar/domain/discounts/DiscountTargets.pdl",
+          "com/mh/mimanjar/domain/discounts/DiscountCalculatedColumns.pdl",
+          "com/mh/mimanjar/domain/discounts/DiscountInstanceCalculatedColumns.pdl"
+        ],
+        "tsConstsExclude": [
+          "com/mh/mimanjar/domain/data/*.pdl"
+        ]
+      }
+    },
+    {
+      "name": "All",
+      "files": {
+        "kotlin": [
+          "**/*.pdl"
+        ],
+        "cpp": [
+          "**/*.pdl"
+        ],
+        "rust": [
+          "**/*.pdl"
+        ],
+        "go": [
+          "**/*.pdl"
+        ],
+        "php": [
+          "**/*.pdl"
+        ],
+        "csharp": [
+          "**/*.pdl"
+        ],
+        "java": [
+          "**/*.pdl"
+        ],
+        "ts": [
+          "**/*.pdl"
+        ],
+        "goExclude": [],
+        "phpExclude": [],
+        "csharpExclude": [],
+        "javaExclude": []
+      }
+    },
+    {
+      "name": "Frontend",
+      "files": {
+        "ts": [
+          "**/*.pdl"
+        ],
+        "tsExclude": []
+      }
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{{- $table := .Data }}
+using Io.Pdl.Infrastructure.Data.RowSet;
+
+namespace {{ $table.PhpEntitiesNamespace }}
+{
+    public sealed class {{ $table.CsharpRowSetClass }} : RowSet<{{ $table.RowClass }}>
+    {
+    }
+}

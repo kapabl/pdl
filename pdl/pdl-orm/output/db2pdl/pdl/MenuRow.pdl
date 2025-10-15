@@ -1,0 +1,19 @@
+namespace io.pdl.mimanjar.domain.data
+
+using {
+}
+
+class MenuRow
+[
+    categoryIds: string
+    createdAt: string
+    description: string
+    [io.pdl.ds.infrastructure.data.attributes.IsDbId]
+    id: int
+    name: string
+    schedule: string
+    status: string
+    storeId: int
+    updatedAt: string
+]
+

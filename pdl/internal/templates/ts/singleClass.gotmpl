@@ -1,0 +1,20 @@
+/**
+ *  {{ index . "companyName" }} Generated File with Pdl
+ *  {{ index . "project" }}
+ *  @version: {{ index . "version" }}
+ *
+ * class {{ index (index . "ClassNode") "FullName" }}
+ */
+
+{{- range index . "Imports" }}
+{{ . }}
+{{- end }}
+
+{{- $classNode := index . "ClassNode" }}
+{{- $parent := index . "ParentClassNode" }}
+export class {{ index $classNode "Name" }} {{ if ne (index $parent "Name") "" }}extends {{ index $parent "UsageName" }}{{ end }}
+{
+{{- range index . "Properties" }}
+    {{ index . "Name" }}: {{ index (index . "ClassNode") "UsageName" }};
+{{- end }}
+}

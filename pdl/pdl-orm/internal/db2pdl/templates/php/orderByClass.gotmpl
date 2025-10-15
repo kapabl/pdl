@@ -1,0 +1,16 @@
+{{- $table := .Data }}
+<?php
+
+namespace {{ $table.PhpEntitiesNamespace }};
+
+use Io\Pdl\Infrastructure\Data\Db\OrderBy;
+
+class {{ $table.OrderByClass }} extends OrderBy
+{
+    protected function setup()
+    {
+{{- range $table.FieldsInfo }}
+        $this->addField( '{{ .Original }}' );
+{{- end }}
+    }
+}

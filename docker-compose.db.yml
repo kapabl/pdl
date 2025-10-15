@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: pdl-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: pdl
+      MARIADB_USER: pdl
+      MARIADB_PASSWORD: pdlpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: pdl-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: pdl
+      MYSQL_USER: pdl
+      MYSQL_PASSWORD: pdlpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mariadb_data:
+  mysql_data:

@@ -1,0 +1,21 @@
+/**
+*  {{ index . "companyName" }} Generated File with Pdl
+*  {{ index . "project" }}
+*  @version: {{ index . "version" }}
+*/
+
+{{- range $class := index . "classes" }}
+{{- $node := index $class "ClassNode" }}
+require( './{{ index $node "Name" }}' );
+{{- end }}
+
+exports = exports || ( module && module.exports
+    ? module.exports
+    : {} );
+
+exports = exports || {};
+{{- range $class := index . "classes" }}
+{{- $node := index $class "ClassNode" }}
+exports.{{ index $node "Name" }} = {{ index $node "FullName" }};
+{{- end }}
+

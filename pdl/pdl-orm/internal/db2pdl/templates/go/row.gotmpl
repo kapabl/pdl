@@ -1,0 +1,206 @@
+{{- $payload := .Data }}
+{{- $table := $payload.TableData }}
+{{- $entity := $table.GoStruct }}
+{{- $accessorType := printf "%sAccessor" $entity }}
+{{- $accessorVar := printf "%sModel" $entity }}
+package {{ $payload.GoPackage }}
+
+import (
+    pdlgo "github.com/kapablanka/pdl/pdl/infra/go"
+{{- range $payload.AdditionalImports }}
+    "{{ . }}"
+{{- end }}
+)
+
+type {{ $entity }} struct {
+    Row *pdlgo.Row `pdl:"-"`
+{{- range $table.FieldsInfo }}
+    {{ .PascalCase }} {{ .GoType }} `pdl:"{{ .Original }}"{{ if .IsPrimaryKey }} pdlpk:"true"{{ end }}{{ if .IsAutoIncrement }} pdlautoincrement:"true"{{ end }}`
+{{- end }}
+}
+
+type {{ lowerFirst $accessorType }} struct{}
+
+var {{ $accessorVar }} = {{ lowerFirst $accessorType }}{}
+
+func (factory {{ lowerFirst $accessorType }}) New() *{{ $entity }} {
+    result := &{{ $entity }}{
+        Row: pdlgo.NewRow("{{ $table.TableName }}", "{{ $table.PrimaryKeyOriginal }}"),
+    }
+    return result
+}
+
+func (record *{{ $entity }}) Create_() error {
+    result := pdlgo.Create(record)
+    return result
+}
+
+func (record *{{ $entity }}) Update_() error {
+    result := pdlgo.Update(record)
+    return result
+}
+
+func (record *{{ $entity }}) Delete_() error {
+    result := pdlgo.Delete(record)
+    return result
+}
+
+type {{ $entity }}WhereBuilder struct {
+    pdlgo.QueryBuilder
+}
+
+func (factory {{ lowerFirst $accessorType }}) Where() {{ $entity }}WhereBuilder {
+    result := {{ $entity }}WhereBuilder{QueryBuilder: pdlgo.NewQueryBuilder("{{ $table.TableName }}", nil)}
+    return result
+}
+
+func (builder {{ $entity }}WhereBuilder) Project_(columns ...string) {{ $entity }}WhereBuilder {
+    builder.QueryBuilder = builder.QueryBuilder.Project(columns...)
+    return builder
+}
+
+func (builder {{ $entity }}WhereBuilder) FieldList_(columns ...string) {{ $entity }}WhereBuilder {
+    return builder.Project_(columns...)
+}
+
+func (builder {{ $entity }}WhereBuilder) Offset_(value int) {{ $entity }}WhereBuilder {
+    builder.QueryBuilder = builder.QueryBuilder.Offset(value)
+    return builder
+}
+
+func (builder {{ $entity }}WhereBuilder) Limit_(value int) {{ $entity }}WhereBuilder {
+    builder.QueryBuilder = builder.QueryBuilder.Limit(value)
+    return builder
+}
+
+func (builder {{ $entity }}WhereBuilder) Range_(offset int, limit int) {{ $entity }}WhereBuilder {
+    builder.QueryBuilder = builder.QueryBuilder.Range(offset, limit)
+    return builder
+}
+
+func (builder {{ $entity }}WhereBuilder) OrderBy_() {{ $entity }}OrderByBuilder {
+    return {{ $entity }}OrderByBuilder{builder: builder}
+}
+
+{{- range $table.FieldsInfo }}
+func (builder {{ $entity }}WhereBuilder) {{ .PascalCase }}(value {{ .GoType }}) {{ $entity }}WhereBuilder {
+    builder.QueryBuilder = builder.QueryBuilder.Filter("{{ .Original }}", pdlgo.OpEq, value)
+    return builder
+}
+{{- end }}
+
+func (builder {{ $entity }}WhereBuilder) Load() ([]map[string]any, error) {
+    result, loadError := builder.QueryBuilder.Load()
+    return result, loadError
+}
+
+func (builder {{ $entity }}WhereBuilder) LoadRows_() ([]*{{ $entity }}, error) {
+    rawRows, loadErr := builder.Load()
+    if loadErr != nil {
+        return nil, loadErr
+    }
+    result := make([]*{{ $entity }}, 0, len(rawRows))
+    for _, entry := range rawRows {
+        record := {{ $accessorVar }}.New()
+        if hydrateErr := pdlgo.Hydrate(record, entry); hydrateErr != nil {
+            return nil, hydrateErr
+        }
+        result = append(result, record)
+    }
+    return result, nil
+}
+
+type {{ $entity }}OrderByBuilder struct {
+    builder {{ $entity }}WhereBuilder
+}
+
+type {{ $entity }}OrderByDirectionBuilder struct {
+    order  {{ $entity }}OrderByBuilder
+    column string
+}
+
+{{- range $table.FieldsInfo }}
+func (order {{ $entity }}OrderByBuilder) {{ .PascalCase }}() {{ $entity }}OrderByDirectionBuilder {
+    return {{ $entity }}OrderByDirectionBuilder{order: order, column: "{{ .Original }}"}
+}
+{{- end }}
+
+func (direction {{ $entity }}OrderByDirectionBuilder) Asc_() {{ $entity }}OrderByBuilder {
+    direction.order.builder.QueryBuilder = direction.order.builder.QueryBuilder.Asc(direction.column)
+    return direction.order
+}
+
+func (direction {{ $entity }}OrderByDirectionBuilder) Desc_() {{ $entity }}OrderByBuilder {
+    direction.order.builder.QueryBuilder = direction.order.builder.QueryBuilder.Desc(direction.column)
+    return direction.order
+}
+
+func (order {{ $entity }}OrderByBuilder) Project_(columns ...string) {{ $entity }}WhereBuilder {
+    return order.builder.Project_(columns...)
+}
+
+func (order {{ $entity }}OrderByBuilder) FieldList_(columns ...string) {{ $entity }}WhereBuilder {
+    return order.builder.FieldList_(columns...)
+}
+
+func (order {{ $entity }}OrderByBuilder) Offset_(value int) {{ $entity }}WhereBuilder {
+    return order.builder.Offset_(value)
+}
+
+func (order {{ $entity }}OrderByBuilder) Limit_(value int) {{ $entity }}WhereBuilder {
+    return order.builder.Limit_(value)
+}
+
+func (order {{ $entity }}OrderByBuilder) Range_(offset int, limit int) {{ $entity }}WhereBuilder {
+    return order.builder.Range_(offset, limit)
+}
+
+func (order {{ $entity }}OrderByBuilder) Load() ([]map[string]any, error) {
+    return order.builder.Load()
+}
+
+func (order {{ $entity }}OrderByBuilder) LoadRows_() ([]*{{ $entity }}, error) {
+    return order.builder.LoadRows_()
+}
+
+func (order {{ $entity }}OrderByBuilder) Delete_() error {
+    return order.builder.Delete_()
+}
+
+func (builder {{ $entity }}WhereBuilder) Delete_() error {
+    result := builder.QueryBuilder.Delete("{{ $table.PrimaryKeyOriginal }}")
+    return result
+}
+
+type {{ $entity }}ColumnsDefinition struct {
+{{- range $table.FieldsInfo }}
+    {{ .PascalCase }} string
+{{- end }}
+}
+
+type {{ $entity }}OrderByDefinition struct {
+{{- range $table.FieldsInfo }}
+    {{ .PascalCase }} string
+{{- end }}
+}
+
+var {{ $entity }}Columns = {{ $entity }}ColumnsDefinition{
+{{- range $table.FieldsInfo }}
+    {{ .PascalCase }}: "{{ .Original }}",
+{{- end }}
+}
+
+var {{ $entity }}OrderBy = {{ $entity }}OrderByDefinition{
+{{- range $table.FieldsInfo }}
+    {{ .PascalCase }}: "{{ .Original }}",
+{{- end }}
+}
+
+func {{ $entity }}ColumnList() []string {
+    result := []string{
+{{- range $table.FieldsInfo }}
+        "{{ .Original }}",
+{{- end }}
+    }
+    return result
+}
