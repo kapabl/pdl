@@ -111,17 +111,19 @@ Use `<profile>Name` as the key, plus the optional `<profile>NameExclude` entry f
 
 ## 4. Db2Pdl/ORM and Optional Services
 
-Set `db2pdl.enabled` (and future service toggles) directly in `pdl.config.json`. Example placeholder:
+Place the ORM payload in `pdl.db2pdl.config.json`, stored alongside `pdl.config.json`. The runner merges it automatically before normalisation:
 
 ```json
-"db2pdl": {
-  "enabled": true,
-  "db2PdlSourceDest": "io/myproject/domain/data",
-  "outputDir": "${PDL_OUTPUT}/pdl"
+{
+  "db2pdl": {
+    "enabled": true,
+    "db2PdlSourceDest": "io/myproject/domain/data",
+    "outputDir": "${PDL_DB2PDL_OUTPUT}"
+  }
 }
 ```
 
-If the block is missing, the CLI assumes the feature is disabled. When `outputDir` is omitted, it resolves to `<outputDir>/pdl` automatically.
+Existing projects that still embed the block inside `pdl.config.json` continue to work, but new scaffolds should rely on the external file. When `outputDir` is omitted, it resolves to `<outputDir>/pdl` automatically (or `${PDL_DB2PDL_OUTPUT}` when set).
 
 ---
 
@@ -149,4 +151,4 @@ Language-specific copies (`PDL_GEN_OUTPUT_*`) are no longer needed; the CLI deri
 
 ---
 
-With these changes, `pdl.config.json` acts as the single source of truth, and every binary in the monorepo (CLI, ORM tools, C++ compiler) reads the same structure. Edit one file, run `pdl --build`, and the rest of the toolchain follows automatically.
+With these changes, `pdl.config.json` and `pdl.db2pdl.config.json` act as a paired source of truth, and every binary in the monorepo (CLI, ORM tools, C++ compiler) reads the same structure. Edit the files once, run `pdl --build`, and the rest of the toolchain follows automatically.

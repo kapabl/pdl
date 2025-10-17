@@ -186,10 +186,24 @@ func Singularize(source string) string {
 }
 
 func ComposeTableData(baseName string, tableName string, config DB2PDLConfig, defaultNamespace string, phpNamespace string, fields []FieldInfo, goImports map[string]struct{}, primaryKeyCamel string, primaryKeyPascal string, primaryKeyOriginal string) TableData {
+	baseNamespace := strings.TrimSpace(config.PDL.EntitiesNamespace)
+	if baseNamespace == "" {
+		baseNamespace = strings.ReplaceAll(defaultNamespace, "/", ".")
+	}
+	javaPackage := strings.TrimSpace(config.Java.Package)
+	if javaPackage == "" {
+		javaPackage = baseNamespace
+	}
+	kotlinPackage := strings.TrimSpace(config.Kotlin.Package)
+	if kotlinPackage == "" {
+		kotlinPackage = baseNamespace
+	}
+	driverType := strings.ToLower(config.Connection.Type)
 	result := TableData{
 		Name:                   baseName,
 		TableName:              tableName,
 		DbName:                 config.Connection.Database,
+		DatabaseDriver:         driverType,
 		PdlRowClass:            baseName + "Row",
 		RowClass:               baseName + "Row",
 		GoStruct:               baseName,
@@ -202,7 +216,9 @@ func ComposeTableData(baseName string, tableName string, config DB2PDLConfig, de
 		CsharpRowSetClass:      baseName + "RowSet",
 		PhpUseNamespaces:       defaultNamespace,
 		PhpEntitiesNamespace:   phpNamespace,
-		PdlEntitiesNamespace:   config.PDL.EntitiesNamespace,
+		PdlEntitiesNamespace:   baseNamespace,
+		JavaPackage:            javaPackage,
+		KotlinPackage:          kotlinPackage,
 		PdlUseNamespaces:       config.PDL.UseNamespaces,
 		PrimaryKeyCamelCase:    primaryKeyCamel,
 		PrimaryKeyPascalCase:   primaryKeyPascal,

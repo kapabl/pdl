@@ -40,6 +40,24 @@ type GoConfig struct {
 	Package string `json:"package"`
 }
 
+type JavaConfig struct {
+	Emit    bool   `json:"emit"`
+	Package string `json:"package"`
+}
+
+type KotlinConfig struct {
+	Emit    bool   `json:"emit"`
+	Package string `json:"package"`
+}
+
+type RustConfig struct {
+	Emit bool `json:"emit"`
+}
+
+type CppConfig struct {
+	Emit bool `json:"emit"`
+}
+
 type ConnectionConfig struct {
 	Type     string `json:"type"`
 	Host     string `json:"host"`
@@ -56,6 +74,10 @@ type DB2PDLConfig struct {
 	OutputDir       string           `json:"outputDir"`
 	TemplatesDir    string           `json:"templatesDir"`
 	TypeScript      TypeScriptConfig `json:"ts"`
+	Java            JavaConfig       `json:"java"`
+	Kotlin          KotlinConfig     `json:"kotlin"`
+	Rust            RustConfig       `json:"rust"`
+	Cpp             CppConfig        `json:"cpp"`
 	CSharp          CSConfig         `json:"cs"`
 	Go              GoConfig         `json:"go"`
 	PHP             PHPConfig        `json:"php"`
@@ -84,47 +106,92 @@ func LoadConfig(configPath string) (RootConfig, error) {
 	if userErr != nil {
 		return result, userErr
 	}
-	basePath := filepath.Join(filepath.Dir(absolutePath), "config", "common.pdl.config.json")
-	mergedConfig, mergeErr := mergeWithBase(basePath, userConfig)
+	mergedConfig, mergeErr := buildMergedConfig(absolutePath, userConfig)
 	if mergeErr != nil {
 		return result, mergeErr
 	}
-	adjustDb2Pdl(mergedConfig)
-	expandEnvInPlace(mergedConfig)
-	payload, encodeErr := json.Marshal(mergedConfig)
-	if encodeErr != nil {
-		return result, encodeErr
-	}
-	decodeErr := json.Unmarshal(payload, &result)
-	if decodeErr != nil {
+	if decodeErr := decodeRootConfig(mergedConfig, &result); decodeErr != nil {
 		return result, decodeErr
 	}
-	result.OutputDir = strings.TrimSpace(result.OutputDir)
-	if result.OutputDir == "" {
-		result.OutputDir = "output"
-	}
-	result.Db2PdlSourceDest = strings.TrimSpace(result.Db2PdlSourceDest)
-	db2PdlSource := strings.TrimSpace(result.DB2PDL.PDL.DB2PDLSourceDest)
-	if db2PdlSource == "" {
-		db2PdlSource = result.Db2PdlSourceDest
-	}
-	result.DB2PDL.PDL.DB2PDLSourceDest = db2PdlSource
-	result.Db2PdlSourceDest = db2PdlSource
-	if result.Verbose && !result.DB2PDL.Verbose {
-		result.DB2PDL.Verbose = true
-	}
-	result.DB2PDL.OutputDir = strings.TrimSpace(result.DB2PDL.OutputDir)
-	if result.DB2PDL.OutputDir == "" {
-		result.DB2PDL.OutputDir = filepath.Join(result.OutputDir, "pdl")
-	}
-	configDir := filepath.Dir(absolutePath)
-	if result.DB2PDL.OutputDir != "" && !filepath.IsAbs(result.DB2PDL.OutputDir) {
-		result.DB2PDL.OutputDir = filepath.Join(configDir, result.DB2PDL.OutputDir)
-	}
-	if result.DB2PDL.TemplatesDir != "" && result.DB2PDL.TemplatesDir != "default" && !filepath.IsAbs(result.DB2PDL.TemplatesDir) {
-		result.DB2PDL.TemplatesDir = filepath.Join(configDir, result.DB2PDL.TemplatesDir)
-	}
+	finalizeDb2Pdl(absolutePath, &result)
 	return result, nil
+}
+
+func buildMergedConfig(configPath string, userConfig map[string]interface{}) (map[string]interface{}, error) {
+	dir := filepath.Dir(configPath)
+	external, extErr := readExternalDb2PdlConfig(dir)
+	if extErr != nil {
+		return nil, extErr
+	}
+	if external != nil {
+		deepMergeMaps(userConfig, external)
+	}
+	basePath := filepath.Join(dir, "config", "common.pdl.config.json")
+	return mergeWithBase(basePath, userConfig)
+}
+
+func readExternalDb2PdlConfig(configDir string) (map[string]interface{}, error) {
+	candidate := filepath.Join(configDir, "pdl.db2pdl.config.json")
+	rawBytes, readErr := os.ReadFile(candidate)
+	if readErr != nil {
+		if errors.Is(readErr, os.ErrNotExist) {
+			return nil, nil
+		}
+		return nil, readErr
+	}
+	var payload interface{}
+	if err := json.Unmarshal(rawBytes, &payload); err != nil {
+		return nil, err
+	}
+	mapped, ok := payload.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("db2pdl config must be a JSON object")
+	}
+	if _, exists := mapped["db2pdl"]; exists {
+		return mapped, nil
+	}
+	return map[string]interface{}{"db2pdl": mapped}, nil
+}
+
+func decodeRootConfig(data map[string]interface{}, target *RootConfig) error {
+	adjustDb2Pdl(data)
+	expandEnvInPlace(data)
+	payload, encodeErr := json.Marshal(data)
+	if encodeErr != nil {
+		return encodeErr
+	}
+	if err := json.Unmarshal(payload, target); err != nil {
+		return err
+	}
+	return nil
+}
+
+func finalizeDb2Pdl(configPath string, cfg *RootConfig) {
+	cfg.OutputDir = strings.TrimSpace(cfg.OutputDir)
+	if cfg.OutputDir == "" {
+		cfg.OutputDir = "output"
+	}
+	cfg.Db2PdlSourceDest = strings.TrimSpace(cfg.Db2PdlSourceDest)
+	db2PdlSource := strings.TrimSpace(cfg.DB2PDL.PDL.DB2PDLSourceDest)
+	if db2PdlSource == "" {
+		db2PdlSource = cfg.Db2PdlSourceDest
+	}
+	cfg.DB2PDL.PDL.DB2PDLSourceDest = db2PdlSource
+	cfg.Db2PdlSourceDest = db2PdlSource
+	if cfg.Verbose && !cfg.DB2PDL.Verbose {
+		cfg.DB2PDL.Verbose = true
+	}
+	cfg.DB2PDL.OutputDir = strings.TrimSpace(cfg.DB2PDL.OutputDir)
+	if cfg.DB2PDL.OutputDir == "" {
+		cfg.DB2PDL.OutputDir = filepath.Join(cfg.OutputDir, "pdl")
+	}
+	configDir := filepath.Dir(configPath)
+	if cfg.DB2PDL.OutputDir != "" && !filepath.IsAbs(cfg.DB2PDL.OutputDir) {
+		cfg.DB2PDL.OutputDir = filepath.Join(configDir, cfg.DB2PDL.OutputDir)
+	}
+	if cfg.DB2PDL.TemplatesDir != "" && cfg.DB2PDL.TemplatesDir != "default" && !filepath.IsAbs(cfg.DB2PDL.TemplatesDir) {
+		cfg.DB2PDL.TemplatesDir = filepath.Join(configDir, cfg.DB2PDL.TemplatesDir)
+	}
 }
 
 func readJSONConfig(configPath string) (map[string]interface{}, error) {

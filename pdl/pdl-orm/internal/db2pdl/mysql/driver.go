@@ -100,12 +100,8 @@ func (driver *Driver) BuildTableData(ctx context.Context, connection *sql.DB, ta
 		camelCase := shared.ToCamelCase(originalName)
 		pascalCase := shared.ToPascalCase(originalName)
 		cleanType := shared.ClearSQLType(fieldType.String)
-		goType := sqlTypeToLanguage("Go", cleanType)
-		if strings.Contains(goType, ".") {
-			parts := strings.Split(goType, ".")
-			if len(parts) == 2 && parts[0] == "time" {
-				goImports["time"] = struct{}{}
-			}
+		if NeedsTimeImport(cleanType) {
+			goImports["time"] = struct{}{}
 		}
 		field := shared.FieldInfo{
 			FieldName:  camelCase,
@@ -113,14 +109,8 @@ func (driver *Driver) BuildTableData(ctx context.Context, connection *sql.DB, ta
 			Original:   originalName,
 			SnakeCase:  originalName,
 			PascalCase: pascalCase,
-			TsType:     sqlTypeToLanguage("TypeScript", cleanType),
 			DbType:     cleanType,
-			PhpType:    sqlTypeToLanguage("Php", cleanType),
-			PdlType:    sqlTypeToLanguage("Pdl", cleanType),
-			GoType:     goType,
 		}
-		phpAttributes := make([]string, 0)
-		pdlAttributes := make([]string, 0)
 		isPrimary := fieldKey.String == "PRI"
 		isNullable := strings.EqualFold(fieldNull.String, "YES")
 		isAutoIncrement := strings.Contains(strings.ToLower(fieldExtra.String), "auto_increment")
@@ -131,18 +121,6 @@ func (driver *Driver) BuildTableData(ctx context.Context, connection *sql.DB, ta
 			primaryKeyCamel = camelCase
 			primaryKeyPascal = pascalCase
 			primaryKeyOriginal = originalName
-			pdlAttributes = append(pdlAttributes, shared.GenerateAttribute(field, driver.config.PDL.Attributes.DbID))
-			phpAttributes = append(phpAttributes, shared.GenerateAttribute(field, driver.config.PHP.Attributes.DbID))
-		}
-		if shared.CantConvertBackAndForth(originalName) {
-			pdlAttributes = append(pdlAttributes, shared.GenerateAttribute(field, driver.config.PDL.Attributes.ColumnName))
-			phpAttributes = append(phpAttributes, shared.GenerateAttribute(field, driver.config.PHP.Attributes.ColumnName))
-		}
-		if len(phpAttributes) > 0 {
-			field.PhpAttributes = strings.Join(phpAttributes, "\n")
-		}
-		if len(pdlAttributes) > 0 {
-			field.PdlAttributes = strings.Join(pdlAttributes, "\n")
 		}
 		fields = append(fields, field)
 	}

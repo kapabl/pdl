@@ -7,7 +7,7 @@ Environments: go1.25.0 (linux/amd64), pnpm 8+, clang toolchain (legacy C++ refer
 Current Status
 
 Phase: execution
-Next step id: S2
+Next step id: S4
 
 S1:
 
@@ -30,3 +30,20 @@ S2:
 Optimizations:
 
 -Introduce a bounded worker-pool for AST generator fanout so large projects parallelize `pdlgen` runs without overwhelming the host.
+
+
+S3: db2pdl - Java, Kotiln
+-Java, koltin generator
+-make them have same functionality as GO and PHP
+-fluent queries, type safe
+
+
+S4:  db2pdl - C++, Rust
+-C++, Rust generator
+-make them have same functionality as GO and PHP
+-fluent queries, type safe
+
+S5:  db2pdl - python
+-python generator
+-make them have same functionality as GO and PHP
+-fluent queries, type safe

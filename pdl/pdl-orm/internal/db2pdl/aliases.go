@@ -9,6 +9,8 @@ type (
 	TypeScriptConfig   = sharedpkg.TypeScriptConfig
 	CSConfig           = sharedpkg.CSConfig
 	GoConfig           = sharedpkg.GoConfig
+	RustConfig         = sharedpkg.RustConfig
+	CppConfig          = sharedpkg.CppConfig
 	ConnectionConfig   = sharedpkg.ConnectionConfig
 	DB2PDLConfig       = sharedpkg.DB2PDLConfig
 	RootConfig         = sharedpkg.RootConfig

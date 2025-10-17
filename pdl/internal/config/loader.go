@@ -22,31 +22,80 @@ func Load(configPath string) (RootConfig, error) {
 		return result, userErr
 	}
 	explicitSections := extractSectionNames(userConfig["sections"])
-	basePath := filepath.Join(filepath.Dir(absolutePath), "config", "common.pdl.config.json")
-	mergedConfig, mergeErr := mergeWithBase(basePath, userConfig)
+	mergedConfig, mergeErr := buildMergedConfig(absolutePath, userConfig)
 	if mergeErr != nil {
 		return result, mergeErr
 	}
-	expandEnvInPlace(mergedConfig)
-	payload, encodeErr := json.Marshal(mergedConfig)
-	if encodeErr != nil {
-		return result, encodeErr
-	}
-	decodeErr := json.Unmarshal(payload, &result)
-	if decodeErr != nil {
+	if decodeErr := decodeIntoRootConfig(mergedConfig, &result); decodeErr != nil {
 		return result, decodeErr
 	}
-	if len(explicitSections) > 0 {
-		result.ActiveSections = make(map[string]struct{}, len(explicitSections))
-		for _, name := range explicitSections {
-			result.ActiveSections[name] = struct{}{}
-		}
-	} else {
-		result.ActiveSections = make(map[string]struct{})
-	}
+	applySectionSelection(&result, explicitSections)
 	setDefaultPaths(&result)
 	setDefaultProfileOutputs(&result)
 	return result, nil
+}
+
+func buildMergedConfig(configPath string, userConfig map[string]interface{}) (map[string]interface{}, error) {
+	var result map[string]interface{}
+	dir := filepath.Dir(configPath)
+	external, extErr := readExternalDb2PdlConfig(dir)
+	if extErr != nil {
+		return result, extErr
+	}
+	if external != nil {
+		deepMergeMaps(userConfig, external)
+	}
+	basePath := filepath.Join(dir, "config", "common.pdl.config.json")
+	result, mergeErr := mergeWithBase(basePath, userConfig)
+	if mergeErr != nil {
+		return result, mergeErr
+	}
+	return result, nil
+}
+
+func readExternalDb2PdlConfig(configDir string) (map[string]interface{}, error) {
+	var result map[string]interface{}
+	candidate := filepath.Join(configDir, "pdl.db2pdl.config.json")
+	rawBytes, readErr := os.ReadFile(candidate)
+	if readErr != nil {
+		if errors.Is(readErr, os.ErrNotExist) {
+			return nil, nil
+		}
+		return result, readErr
+	}
+	var payload interface{}
+	if err := json.Unmarshal(rawBytes, &payload); err != nil {
+		return result, err
+	}
+	mapped, ok := payload.(map[string]interface{})
+	if !ok {
+		return result, fmt.Errorf("db2pdl config must be a JSON object")
+	}
+	if _, exists := mapped["db2pdl"]; exists {
+		return mapped, nil
+	}
+	result = map[string]interface{}{"db2pdl": mapped}
+	return result, nil
+}
+
+func decodeIntoRootConfig(data map[string]interface{}, target *RootConfig) error {
+	expandEnvInPlace(data)
+	payload, encodeErr := json.Marshal(data)
+	if encodeErr != nil {
+		return encodeErr
+	}
+	decodeErr := json.Unmarshal(payload, target)
+	if decodeErr != nil {
+		return decodeErr
+	}
+	return nil
+}
+
+func applySectionSelection(cfg *RootConfig, explicitSections []string) {
+	cfg.ActiveSections = make(map[string]struct{})
+	for _, name := range explicitSections {
+		cfg.ActiveSections[name] = struct{}{}
+	}
 }
 
 func readJSONConfig(configPath string) (map[string]interface{}, error) {

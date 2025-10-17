@@ -1,0 +1,283 @@
+{{- $table := .Table }}
+{{- $fields := .Fields }}
+{{- $imports := .Imports }}
+{{- $accessorConst := .AccessorName }}
+{{- $accessorType := printf "%sAccess" $table.Name }}
+{{- $whereType := printf "%sWhereBuilder" $table.Name }}
+{{- $orderType := printf "%sOrderByBuilder" $table.Name }}
+{{- $directionType := printf "%sOrderByDirectionBuilder" $table.Name }}
+{{- $columnsStruct := $table.ColumnsDefinitionClass }}
+{{- $orderColumnsStruct := printf "%sColumns" $table.OrderByClass }}
+{{- range $imports }}use {{ . }};
+{{- end }}
+use std::collections::HashMap;
+use std::sync::Arc;
+use serde_json::{self, Value};
+use pdl_infrastructure::data::{DBStore, DbError, Operator, OrderDirection, QueryBuilder, Record, Row, RowExecutor, RowMap};
+
+#[derive(Debug, Clone, Default)]
+pub struct {{ $table.RowClass }} {
+    pub row: Row,
+{{- range $fields }}
+    pub {{ .RustName }}: Option<{{ .RustType }}>,
+{{- end }}
+}
+
+impl {{ $table.RowClass }} {
+    pub fn new() -> Self {
+        Self {
+            row: Row::new("{{ $table.TableName }}", "{{ $table.PrimaryKeyOriginal }}"),
+{{- range $fields }}
+            {{ .RustName }}: None,
+{{- end }}
+        }
+    }
+
+    pub fn create(&mut self) -> Result<(), DbError> {
+        RowExecutor::create(self)
+    }
+
+    pub fn update(&mut self) -> Result<(), DbError> {
+        RowExecutor::update(self)
+    }
+
+    pub fn delete(&mut self) -> Result<(), DbError> {
+        RowExecutor::delete(self)
+    }
+}
+
+#[derive(Clone, Copy, Default)]
+pub struct {{ $accessorType }};
+
+pub const {{ $accessorConst }}: {{ $accessorType }} = {{ $accessorType }};
+
+impl {{ $accessorType }} {
+    pub fn new_record(&self) -> {{ $table.RowClass }} {
+        {{ $table.RowClass }}::new()
+    }
+
+    pub fn where_clause(&self) -> {{ $whereType }} {
+        {{ $whereType }}::new(QueryBuilder::new("{{ $table.TableName }}", None))
+    }
+
+    pub fn with_store(&self, store: Arc<dyn DBStore>) -> {{ $whereType }} {
+        {{ $whereType }}::new(QueryBuilder::new("{{ $table.TableName }}", Some(store)))
+    }
+
+    pub fn column_list(&self) -> Vec<&'static str> {
+        vec![
+{{- range $index, $field := $fields }}{{ if $index }}, {{ end }}"{{ $field.Original }}"{{- end }}
+        ]
+    }
+}
+
+pub struct {{ $whereType }} {
+    builder: QueryBuilder,
+}
+
+impl {{ $whereType }} {
+    fn new(builder: QueryBuilder) -> Self {
+        Self { builder }
+    }
+
+    pub fn project(mut self, columns: &[&str]) -> Self {
+        self.builder.projection(columns);
+        self
+    }
+
+    pub fn field_list(self, columns: &[&str]) -> Self {
+        self.project(columns)
+    }
+
+    pub fn offset(mut self, value: i32) -> Self {
+        self.builder.offset(value);
+        self
+    }
+
+    pub fn limit(mut self, value: i32) -> Self {
+        self.builder.limit(value);
+        self
+    }
+
+    pub fn range(mut self, offset: i32, limit: i32) -> Self {
+        self.builder.range(offset, limit);
+        self
+    }
+
+    pub fn order_by(self) -> {{ $orderType }} {
+        {{ $orderType }}::new(self)
+    }
+
+{{- range $fields }}
+    pub fn {{ .RustName }}(mut self, value: {{ .RustType }}) -> Self {
+        self.builder.filter("{{ .Original }}", Operator::Eq, value);
+        self
+    }
+{{- end }}
+
+    pub fn load(&self) -> Result<Vec<HashMap<String, Value>>, DbError> {
+        self.builder.load()
+    }
+
+    pub fn load_rows(&self) -> Result<Vec<{{ $table.RowClass }}>, DbError> {
+        let rows = self.load()?;
+        let mut result = Vec::with_capacity(rows.len());
+        for entry in rows {
+            let mut record = {{ $table.RowClass }}::new();
+            RowExecutor::hydrate(&mut record, &entry)?;
+            result.push(record);
+        }
+        Ok(result)
+    }
+
+    pub fn delete(&self) -> Result<(), DbError> {
+        self.builder.delete("{{ $table.PrimaryKeyOriginal }}")
+    }
+
+    fn builder_mut(&mut self) -> &mut QueryBuilder {
+        &mut self.builder
+    }
+}
+
+pub struct {{ $orderType }} {
+    where_builder: {{ $whereType }},
+}
+
+impl {{ $orderType }} {
+    fn new(where_builder: {{ $whereType }}) -> Self {
+        Self { where_builder }
+    }
+
+{{- range $fields }}
+    pub fn {{ .RustName }}(self) -> {{ $directionType }} {
+        {{ $directionType }}::new(self, "{{ .Original }}")
+    }
+{{- end }}
+
+    pub fn project(self, columns: &[&str]) -> {{ $whereType }} {
+        self.where_builder.project(columns)
+    }
+
+    pub fn field_list(self, columns: &[&str]) -> {{ $whereType }} {
+        self.where_builder.field_list(columns)
+    }
+
+    pub fn offset(self, value: i32) -> {{ $whereType }} {
+        self.where_builder.offset(value)
+    }
+
+    pub fn limit(self, value: i32) -> {{ $whereType }} {
+        self.where_builder.limit(value)
+    }
+
+    pub fn range(self, offset: i32, limit: i32) -> {{ $whereType }} {
+        self.where_builder.range(offset, limit)
+    }
+
+    pub fn load(&self) -> Result<Vec<HashMap<String, Value>>, DbError> {
+        self.where_builder.load()
+    }
+
+    pub fn load_rows(&self) -> Result<Vec<{{ $table.RowClass }}>, DbError> {
+        self.where_builder.load_rows()
+    }
+
+    pub fn delete(&self) -> Result<(), DbError> {
+        self.where_builder.delete()
+    }
+
+    fn builder_mut(&mut self) -> &mut QueryBuilder {
+        self.where_builder.builder_mut()
+    }
+}
+
+pub struct {{ $directionType }} {
+    order: {{ $orderType }},
+    column: &'static str,
+}
+
+impl {{ $directionType }} {
+    fn new(order: {{ $orderType }}, column: &'static str) -> Self {
+        Self { order, column }
+    }
+
+    pub fn asc(mut self) -> {{ $orderType }} {
+        self.order.builder_mut().order_by(self.column, OrderDirection::Asc);
+        self.order
+    }
+
+    pub fn desc(mut self) -> {{ $orderType }} {
+        self.order.builder_mut().order_by(self.column, OrderDirection::Desc);
+        self.order
+    }
+}
+
+pub struct {{ $columnsStruct }};
+
+impl {{ $columnsStruct }} {
+{{- range $fields }}
+    pub const {{ upperSnake .PascalCase }}: &'static str = "{{ .Original }}";
+{{- end }}
+    pub const ALL: [&'static str; {{ len $fields }}] = [
+{{- range $fields }}
+        "{{ .Original }}",
+{{- end }}
+    ];
+}
+
+impl Record for {{ $table.RowClass }} {
+    fn row_meta(&self) -> &Row {
+        &self.row
+    }
+
+    fn row_meta_mut(&mut self) -> &mut Row {
+        &mut self.row
+    }
+
+    fn collect_values(&self) -> RowMap {
+        let mut values = RowMap::new();
+{{- range $fields }}
+        values.insert(
+            String::from("{{ .Original }}"),
+            match &self.{{ .RustName }} {
+                Some(value) => serde_json::to_value(value).unwrap_or(Value::Null),
+                None => Value::Null,
+            },
+        );
+{{- end }}
+        values
+    }
+
+    fn apply_row_map(&mut self, values: &RowMap) -> Result<(), DbError> {
+        for (column, value) in values {
+            match column.as_str() {
+{{- range $fields }}
+                "{{ .Original }}" => {
+                    if value.is_null() {
+                        self.{{ .RustName }} = None;
+                    } else {
+                        let decoded = serde_json::from_value::<{{ .RustType }}>(value.clone())
+                            .map_err(|err| DbError::new(err.to_string()))?;
+                        self.{{ .RustName }} = Some(decoded);
+                    }
+                }
+{{- end }}
+                _ => {}
+            }
+        }
+        Ok(())
+    }
+}
+
+pub struct {{ $orderColumnsStruct }};
+
+impl {{ $orderColumnsStruct }} {
+{{- range $fields }}
+    pub const {{ upperSnake .PascalCase }}: &'static str = "{{ .Original }}";
+{{- end }}
+    pub const ALL: [&'static str; {{ len $fields }}] = [
+{{- range $fields }}
+        "{{ .Original }}",
+{{- end }}
+    ];
+}

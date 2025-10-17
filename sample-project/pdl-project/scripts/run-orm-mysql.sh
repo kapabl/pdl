@@ -27,6 +27,7 @@ export PDL_GEN_OUTPUT_JS="${project_dir}/output/js"
 export PDL_GEN_OUTPUT_BUNDLE="${project_dir}/output/bundle"
 export PDL_GEN_OUTPUT_GO="${project_dir}/output/go"
 DB2PDL_BIN=""
+PDL_BIN_PATH="../../pdl/bin"
 if [ -n "${PDL_BIN_PATH:-}" ]; then
   DB2PDL_BIN="${PDL_BIN_PATH%/}/db2pdl"
 fi

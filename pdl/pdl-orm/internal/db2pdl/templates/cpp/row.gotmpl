@@ -1,0 +1,336 @@
+{{- $table := .Table }}
+{{- $fields := .Fields }}
+{{- $includes := .Includes }}
+{{- $namespace := .Namespace }}
+{{- $accessorType := .AccessorType }}
+{{- $accessorConst := .AccessorConst }}
+{{- $whereType := printf "%sWhereBuilder" $table.Name }}
+{{- $orderType := printf "%sOrderByBuilder" $table.Name }}
+{{- $directionType := printf "%sOrderByDirectionBuilder" $table.Name }}
+{{- $columnsStruct := $table.ColumnsDefinitionClass }}
+{{- $orderColumnsStruct := printf "%sColumns" $table.OrderByClass }}
+#pragma once
+{{- range $includes }}
+#include {{ . }}
+{{- end }}
+
+{{- if $namespace }}
+namespace {{ $namespace }} {
+{{ end }}
+
+using DBStorePtr = pdl_infrastructure::data::DBStorePtr;
+using Operator = pdl_infrastructure::data::Operator;
+using OrderDirection = pdl_infrastructure::data::OrderDirection;
+using QueryBuilder = pdl_infrastructure::data::QueryBuilder;
+using Row = pdl_infrastructure::data::Row;
+using RowExecutor = pdl_infrastructure::data::RowExecutor;
+using RowMap = pdl_infrastructure::data::RowMap;
+using Value = pdl_infrastructure::data::Value;
+
+class {{ $table.RowClass }} {
+public:
+    {{ $table.RowClass }}();
+
+    Row &RowMetadata();
+    const Row &RowMetadata() const;
+
+{{- range $fields }}
+    std::optional<{{ .CppType }}> {{ .MemberName }};
+{{- end }}
+
+    void Create();
+    void Update();
+    void Delete();
+
+    RowMap CollectValues() const;
+
+    void ApplyValues(const RowMap& values);
+
+private:
+    Row row_;
+};
+
+class {{ $accessorType }} final {
+public:
+    {{ $table.RowClass }} NewRecord() const;
+    {{ $whereType }} Where() const;
+    {{ $whereType }} WithStore(DBStorePtr store) const;
+    std::vector<std::string> ColumnList() const;
+};
+
+class {{ $whereType }} {
+public:
+    explicit {{ $whereType }}(QueryBuilder builder);
+
+    {{ $whereType }} &Project(std::initializer_list<const char *> columns);
+    {{ $whereType }} &FieldList(std::initializer_list<const char *> columns);
+    {{ $whereType }} &Offset(std::int32_t value);
+    {{ $whereType }} &Limit(std::int32_t value);
+    {{ $whereType }} &Range(std::int32_t offset, std::int32_t limit);
+    {{ $orderType }} OrderBy();
+{{- range $fields }}
+    {{ $whereType }} &{{ .MemberName }}(const {{ .CppType }} &value);
+{{- end }}
+
+    auto Load() -> decltype(builder_.Load());
+    std::vector<{{ $table.RowClass }}> LoadRows();
+    void Delete();
+
+    QueryBuilder &InternalBuilder();
+
+private:
+    QueryBuilder builder_;
+};
+
+class {{ $orderType }} {
+public:
+    explicit {{ $orderType }}({{ $whereType }} whereBuilder);
+
+{{- range $fields }}
+    {{ $directionType }} {{ .MemberName }}();
+{{- end }}
+
+    {{ $whereType }} &FieldList(std::initializer_list<const char *> columns);
+    {{ $whereType }} &Project(std::initializer_list<const char *> columns);
+    {{ $whereType }} &Offset(std::int32_t value);
+    {{ $whereType }} &Limit(std::int32_t value);
+    {{ $whereType }} &Range(std::int32_t offset, std::int32_t limit);
+
+    auto Load() -> decltype(whereBuilder_.Load());
+    std::vector<{{ $table.RowClass }}> LoadRows();
+    void Delete();
+
+    {{ $whereType }} &Where();
+
+private:
+    {{ $whereType }} whereBuilder_;
+};
+
+class {{ $directionType }} {
+public:
+    {{ $directionType }}({{ $orderType }} orderBuilder, const char *column);
+
+    {{ $orderType }} Asc();
+    {{ $orderType }} Desc();
+
+private:
+    {{ $orderType }} orderBuilder_;
+    const char *column_;
+};
+
+class {{ $columnsStruct }} {
+public:
+{{- range $fields }}
+    static constexpr const char *{{ upperSnake .PascalCase }} = "{{ .Original }}";
+{{- end }}
+};
+
+class {{ $orderColumnsStruct }} {
+public:
+{{- range $fields }}
+    static constexpr const char *{{ upperSnake .PascalCase }} = "{{ .Original }}";
+{{- end }}
+};
+
+inline {{ $table.RowClass }}::{{ $table.RowClass }}()
+    : row_("{{ $table.TableName }}", "{{ $table.PrimaryKeyOriginal }}") {}
+
+inline Row &{{ $table.RowClass }}::RowMetadata() {
+    return row_;
+}
+
+inline const Row &{{ $table.RowClass }}::RowMetadata() const {
+    return row_;
+}
+
+inline void {{ $table.RowClass }}::Create() {
+    RowExecutor::Create(*this);
+}
+
+inline void {{ $table.RowClass }}::Update() {
+    RowExecutor::Update(*this);
+}
+
+inline void {{ $table.RowClass }}::Delete() {
+    RowExecutor::Delete(*this);
+}
+
+inline RowMap {{ $table.RowClass }}::CollectValues() const {
+    RowMap values;
+{{- range $fields }}
+    if ({{ .MemberName }}) {
+        values.emplace("{{ .Original }}", *{{ .MemberName }});
+    } else {
+        values.emplace("{{ .Original }}", Value{});
+    }
+{{- end }}
+    return values;
+}
+
+inline void {{ $table.RowClass }}::ApplyValues(const RowMap &values) {
+{{- range $fields }}
+    if (auto iter = values.find("{{ .Original }}"); iter != values.end()) {
+        const auto &data = iter->second;
+        if (!data.has_value()) {
+            {{ .MemberName }}.reset();
+            continue;
+        }
+        if (const auto valuePtr = std::any_cast<const {{ .CppType }}>(&data)) {
+            {{ .MemberName }} = *valuePtr;
+            continue;
+        }
+        if (const auto optionalPtr = std::any_cast<const std::optional<{{ .CppType }}>>(&data)) {
+            {{ .MemberName }} = *optionalPtr;
+            continue;
+        }
+    }
+{{- end }}
+}
+
+inline {{ $table.RowClass }} {{ $accessorType }}::NewRecord() const {
+    return {{ $table.RowClass }}();
+}
+
+inline {{ $whereType }} {{ $accessorType }}::Where() const {
+    return {{ $whereType }}(QueryBuilder("{{ $table.TableName }}", DBStorePtr{}));
+}
+
+inline {{ $whereType }} {{ $accessorType }}::WithStore(DBStorePtr store) const {
+    return {{ $whereType }}(QueryBuilder("{{ $table.TableName }}", std::move(store)));
+}
+
+inline std::vector<std::string> {{ $accessorType }}::ColumnList() const {
+    return std::vector<std::string>{
+{{- range $index, $field := $fields }}{{ if $index }}, {{ end }}"{{ $field.Original }}"{{- end }}
+    };
+}
+
+inline const {{ $accessorType }} {{ $accessorConst }} = {{ $accessorType }}();
+
+inline {{ $whereType }}::{{ $whereType }}(QueryBuilder builder)
+    : builder_(std::move(builder)) {}
+
+inline {{ $whereType }} &{{ $whereType }}::Project(std::initializer_list<const char *> columns) {
+    std::vector<std::string> values;
+    values.reserve(columns.size());
+    for (const char *entry : columns) {
+        values.emplace_back(entry);
+    }
+    builder_.Project(values);
+    return *this;
+}
+
+inline {{ $whereType }} &{{ $whereType }}::FieldList(std::initializer_list<const char *> columns) {
+    return Project(columns);
+}
+
+inline {{ $whereType }} &{{ $whereType }}::Offset(std::int32_t value) {
+    builder_.Offset(value);
+    return *this;
+}
+
+inline {{ $whereType }} &{{ $whereType }}::Limit(std::int32_t value) {
+    builder_.Limit(value);
+    return *this;
+}
+
+inline {{ $whereType }} &{{ $whereType }}::Range(std::int32_t offset, std::int32_t limit) {
+    builder_.Range(offset, limit);
+    return *this;
+}
+
+inline {{ $orderType }} {{ $whereType }}::OrderBy() {
+    return {{ $orderType }}(*this);
+}
+
+{{- range $fields }}
+inline {{ $whereType }} &{{ $whereType }}::{{ .MemberName }}(const {{ .CppType }} &value) {
+    builder_.Filter("{{ .Original }}", Operator::Eq, value);
+    return *this;
+}
+{{- end }}
+
+inline auto {{ $whereType }}::Load() -> decltype(builder_.Load()) {
+    return builder_.Load();
+}
+
+inline std::vector<{{ $table.RowClass }}> {{ $whereType }}::LoadRows() {
+    auto rows = Load();
+    std::vector<{{ $table.RowClass }}> result;
+    result.reserve(rows.size());
+    for (const auto &entry : rows) {
+        auto record = {{ $table.RowClass }}();
+        RowExecutor::Hydrate(record, entry);
+        result.push_back(record);
+    }
+    return result;
+}
+
+inline void {{ $whereType }}::Delete() {
+    builder_.Delete("{{ $table.PrimaryKeyOriginal }}");
+}
+
+inline QueryBuilder &{{ $whereType }}::InternalBuilder() {
+    return builder_;
+}
+
+inline {{ $orderType }}::{{ $orderType }}({{ $whereType }} whereBuilder)
+    : whereBuilder_(whereBuilder) {}
+
+{{- range $fields }}
+inline {{ $directionType }} {{ $orderType }}::{{ .MemberName }}() {
+    return {{ $directionType }}(*this, "{{ .Original }}");
+}
+{{- end }}
+
+inline {{ $whereType }} &{{ $orderType }}::FieldList(std::initializer_list<const char *> columns) {
+    return whereBuilder_.FieldList(columns);
+}
+
+inline {{ $whereType }} &{{ $orderType }}::Project(std::initializer_list<const char *> columns) {
+    return whereBuilder_.Project(columns);
+}
+
+inline {{ $whereType }} &{{ $orderType }}::Offset(std::int32_t value) {
+    return whereBuilder_.Offset(value);
+}
+
+inline {{ $whereType }} &{{ $orderType }}::Limit(std::int32_t value) {
+    return whereBuilder_.Limit(value);
+}
+
+inline {{ $whereType }} &{{ $orderType }}::Range(std::int32_t offset, std::int32_t limit) {
+    return whereBuilder_.Range(offset, limit);
+}
+
+inline auto {{ $orderType }}::Load() -> decltype(whereBuilder_.Load()) {
+    return whereBuilder_.Load();
+}
+
+inline std::vector<{{ $table.RowClass }}> {{ $orderType }}::LoadRows() {
+    return whereBuilder_.LoadRows();
+}
+
+inline void {{ $orderType }}::Delete() {
+    whereBuilder_.Delete();
+}
+
+inline {{ $whereType }} &{{ $orderType }}::Where() {
+    return whereBuilder_;
+}
+
+inline {{ $directionType }}::{{ $directionType }}({{ $orderType }} orderBuilder, const char *column)
+    : orderBuilder_(orderBuilder), column_(column) {}
+
+inline {{ $orderType }} {{ $directionType }}::Asc() {
+    orderBuilder_.Where().InternalBuilder().OrderBy(column_, OrderDirection::Asc);
+    return orderBuilder_;
+}
+
+inline {{ $orderType }} {{ $directionType }}::Desc() {
+    orderBuilder_.Where().InternalBuilder().OrderBy(column_, OrderDirection::Desc);
+    return orderBuilder_;
+}
+{{- if $namespace }}
+} // namespace {{ $namespace }}
+{{ end }}

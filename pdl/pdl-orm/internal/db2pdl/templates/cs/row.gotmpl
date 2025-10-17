@@ -1,0 +1,192 @@
+{{- $table := .Data }}
+{{- $fields := $table.FieldsInfo }}
+using System;
+using System.Collections.Generic;
+using Io.Pdl.Infrastructure.Data;
+
+namespace {{ $table.PhpEntitiesNamespace }}
+{
+    public class {{ $table.RowClass }} : Row
+    {
+        private static readonly IReadOnlyDictionary<string, string> ColumnMap = new Dictionary<string, string>
+        {
+{{- range $fields }}
+            { "{{ .CamelCase }}", "{{ .Original }}" },
+{{- end }}
+        };
+
+        public {{ $table.RowClass }}(IDbStore? store = null)
+            : base("{{ $table.TableName }}", "{{ $table.PrimaryKeyOriginal }}", ColumnMap, store)
+        {
+        }
+
+{{- range $fields }}
+        public {{ .CSharpType }} {{ .PascalCase }} { get; set; }
+{{- end }}
+
+        public static {{ $table.RowClass }} New(IDbStore? store = null) => new {{ $table.RowClass }}(store);
+
+        public static {{ $table.WhereClass }} Where(IDbStore? store = null)
+        {
+            return new {{ $table.WhereClass }}(new QueryBuilder("{{ $table.TableName }}", store), ColumnMap, typeof({{ $table.RowClass }}));
+        }
+
+        public static IReadOnlyList<string> ColumnList() => {{ $table.ColumnsDefinitionClass }}.List();
+
+        public void Create() => RowExecutor.Create(this);
+
+        public void Update() => RowExecutor.Update(this);
+
+        public void Delete() => RowExecutor.Delete(this);
+    }
+
+    public class {{ $table.WhereClass }}
+    {
+        private readonly QueryBuilder _builder;
+        private readonly IReadOnlyDictionary<string, string> _columnMap;
+        private readonly Type _rowType;
+
+        public {{ $table.WhereClass }}(QueryBuilder builder, IReadOnlyDictionary<string, string> columnMap, Type rowType)
+        {
+            _builder = builder;
+            _columnMap = columnMap;
+            _rowType = rowType;
+        }
+
+        public {{ $table.WhereClass }} Project(params string[] columns)
+        {
+            _builder.Project(columns);
+            return this;
+        }
+
+        public {{ $table.WhereClass }} FieldList(params string[] columns) => Project(columns);
+
+        public {{ $table.WhereClass }} Offset(int value)
+        {
+            _builder.Offset(value);
+            return this;
+        }
+
+        public {{ $table.WhereClass }} Limit(int value)
+        {
+            _builder.Limit(value);
+            return this;
+        }
+
+        public {{ $table.WhereClass }} Range(int offset, int limit)
+        {
+            _builder.Range(offset, limit);
+            return this;
+        }
+
+        public {{ $table.OrderByClass }} OrderBy() => new {{ $table.OrderByClass }}(this);
+
+{{- range $fields }}
+        public {{ $table.WhereClass }} {{ .PascalCase }}({{ .CSharpType }} value)
+        {
+            _builder.Filter("{{ .Original }}", Operator.Eq, value);
+            return this;
+        }
+{{- end }}
+
+        public IReadOnlyList<Dictionary<string, object?>> Load()
+        {
+            var result = new List<Dictionary<string, object?>>();
+            foreach (var row in _builder.Load())
+            {
+                result.Add(new Dictionary<string, object?>(row));
+            }
+            return result;
+        }
+
+        public IList<{{ $table.RowClass }}> LoadRows()
+        {
+            var rows = _builder.Load();
+            var result = new List<{{ $table.RowClass }}>(rows.Count);
+            foreach (var entry in rows)
+            {
+                var instance = ({{ $table.RowClass }})Activator.CreateInstance(_rowType)!;
+                RowExecutor.Hydrate(instance, entry);
+                result.Add(instance);
+            }
+            return result;
+        }
+
+        public void Delete()
+        {
+            _builder.Delete("{{ $table.PrimaryKeyOriginal }}");
+        }
+
+        internal QueryBuilder Builder => _builder;
+    }
+
+    public class {{ $table.OrderByClass }}
+    {
+        private readonly {{ $table.WhereClass }} _where;
+
+        public {{ $table.OrderByClass }}({{ $table.WhereClass }} where)
+        {
+            _where = where;
+        }
+
+{{- range $fields }}
+        public {{ $table.OrderByClass }}Direction {{ .PascalCase }}() => new {{ $table.OrderByClass }}Direction(this, "{{ .Original }}");
+{{- end }}
+
+        public {{ $table.WhereClass }} Project(params string[] columns) => _where.Project(columns);
+
+        public {{ $table.WhereClass }} FieldList(params string[] columns) => _where.FieldList(columns);
+
+        public {{ $table.WhereClass }} Offset(int value) => _where.Offset(value);
+
+        public {{ $table.WhereClass }} Limit(int value) => _where.Limit(value);
+
+        public {{ $table.WhereClass }} Range(int offset, int limit) => _where.Range(offset, limit);
+
+        public IReadOnlyList<Dictionary<string, object?>> Load() => _where.Load();
+
+        public IList<{{ $table.RowClass }}> LoadRows() => _where.LoadRows();
+
+        public void Delete() => _where.Delete();
+
+        internal {{ $table.WhereClass }} Where => _where;
+    }
+
+    public class {{ $table.OrderByClass }}Direction
+    {
+        private readonly {{ $table.OrderByClass }} _order;
+        private readonly string _column;
+
+        public {{ $table.OrderByClass }}Direction({{ $table.OrderByClass }} order, string column)
+        {
+            _order = order;
+            _column = column;
+        }
+
+        public {{ $table.OrderByClass }} Asc()
+        {
+            _order.Where.Builder.OrderBy(_column, OrderDirection.Asc);
+            return _order;
+        }
+
+        public {{ $table.OrderByClass }} Desc()
+        {
+            _order.Where.Builder.OrderBy(_column, OrderDirection.Desc);
+            return _order;
+        }
+    }
+
+    public static class {{ $table.ColumnsDefinitionClass }}
+    {
+{{- range $fields }}
+        public const string {{ upperSnake .PascalCase }} = "{{ .Original }}";
+{{- end }}
+
+        public static IReadOnlyList<string> List() => new[]
+        {
+{{- range $fields }}
+            "{{ .Original }}",
+{{- end }}
+        };
+    }
+}

@@ -1,17 +1,19 @@
 package db2pdl
 
 import (
-    "bytes"
-    "encoding/json"
-    "fmt"
-    "path/filepath"
-    "sync"
-    "text/template"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"path/filepath"
+	"sync"
+	"text/template"
 
-    "io/fs"
-    "os"
-    "strings"
-    "unicode"
+	"io/fs"
+	"os"
+	"strings"
+	"unicode"
+
+	"github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/shared"
 )
 
 type TemplateUtils struct {
@@ -44,18 +46,24 @@ func NewTemplateUtils(config RootConfig, templatesDir string, useExternal bool) 
 				return "{" + fmt.Sprint(value) + "}"
 			},
 			"not": func(input bool) bool { return !input },
-            "trimSuffix": func(value string, suffix string) string {
-                return strings.TrimSuffix(value, suffix)
-            },
-            "lowerFirst": func(value string) string {
-                if value == "" {
-                    return value
-                }
-                runes := []rune(value)
-                runes[0] = unicode.ToLower(runes[0])
-                return string(runes)
-            },
-        },
+			"trimSuffix": func(value string, suffix string) string {
+				return strings.TrimSuffix(value, suffix)
+			},
+			"lowerFirst": func(value string) string {
+				if value == "" {
+					return value
+				}
+				runes := []rune(value)
+				runes[0] = unicode.ToLower(runes[0])
+				return string(runes)
+			},
+			"snakeCase": func(value string) string {
+				return shared.ToSnakeCaseFromPascal(value)
+			},
+			"upperSnake": func(value string) string {
+				return strings.ToUpper(shared.ToSnakeCaseFromPascal(value))
+			},
+		},
 	}
 	return result, nil
 }

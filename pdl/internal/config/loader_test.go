@@ -6,6 +6,26 @@ import (
 	"testing"
 )
 
+const (
+	mainConfigWithSections = `{
+  "companyName": "ExternalCo",
+  "project": "SplitConfig",
+  "profiles": {
+    "js": {"enabled": true}
+  },
+  "sections": [
+    {"name": "Frontend", "files": {"js": ["**/*.pdl"], "jsExclude": []}}
+  ]
+}`
+	externalDb2PdlConfig = `{
+  "db2pdl": {
+    "enabled": true,
+    "db2PdlSourceDest": "external/domain/data",
+    "go": {"emit": true}
+  }
+}`
+)
+
 func TestLoadMergesConfigs(t *testing.T) {
 	tempDir := t.TempDir()
 	configDir := filepath.Join(tempDir, "config")
@@ -13,8 +33,8 @@ func TestLoadMergesConfigs(t *testing.T) {
 		t.Fatalf("failed to create config directory: %v", err)
 	}
 	outputDir := filepath.Join(tempDir, "output")
-	os.Setenv("PDL_OUTPUT", outputDir)
-	os.Setenv("PDL_TEMPLATES_DIR", filepath.Join(tempDir, "templates"))
+	t.Setenv("PDL_OUTPUT", outputDir)
+	t.Setenv("PDL_TEMPLATES_DIR", filepath.Join(tempDir, "templates"))
 
 	baseConfig := `{
   "companyName": "BaseCo",
@@ -111,8 +131,8 @@ func TestLoadMergesConfigs(t *testing.T) {
 func TestLoadUsesEmbeddedDefaults(t *testing.T) {
 	tempDir := t.TempDir()
 	outputDir := filepath.Join(tempDir, "output")
-	os.Setenv("PDL_OUTPUT", outputDir)
-	os.Setenv("PDL_TEMPLATES_DIR", filepath.Join(tempDir, "templates"))
+	t.Setenv("PDL_OUTPUT", outputDir)
+	t.Setenv("PDL_TEMPLATES_DIR", filepath.Join(tempDir, "templates"))
 
 	payload := `{
   "project": "Embedded",
@@ -144,5 +164,45 @@ func TestLoadUsesEmbeddedDefaults(t *testing.T) {
 	}
 	if value, ok := profileJS.Options["generateAsObject"].(bool); !ok || !value {
 		t.Fatalf("expected generateAsObject to be true, got %#v", profileJS.Options["generateAsObject"])
+	}
+}
+
+func TestLoadReadsExternalDb2PdlConfig(t *testing.T) {
+	tempDir := t.TempDir()
+	configDir := filepath.Join(tempDir, "config")
+	if err := os.MkdirAll(configDir, 0o755); err != nil {
+		t.Fatalf("failed to create config directory: %v", err)
+	}
+	t.Setenv("PDL_OUTPUT", filepath.Join(tempDir, "out"))
+	t.Setenv("PDL_TEMPLATES_DIR", filepath.Join(tempDir, "tpl"))
+
+	mainPath := filepath.Join(tempDir, "pdl.config.json")
+	externalPath := filepath.Join(tempDir, "pdl.db2pdl.config.json")
+	writeConfigFile(t, mainPath, mainConfigWithSections)
+	writeConfigFile(t, externalPath, externalDb2PdlConfig)
+
+	cfg, err := Load(mainPath)
+	if err != nil {
+		t.Fatalf("load failed: %v", err)
+	}
+	if !cfg.Db2Pdl.Enabled {
+		t.Fatalf("expected db2pdl enabled via external file")
+	}
+	if cfg.Db2Pdl.Db2PdlSourceDest != "external/domain/data" {
+		t.Fatalf("expected external db2PdlSourceDest, got %s", cfg.Db2Pdl.Db2PdlSourceDest)
+	}
+	goConfig, ok := cfg.Db2Pdl.Options["go"].(map[string]interface{})
+	if !ok {
+		t.Fatalf("expected go options map, got %#v", cfg.Db2Pdl.Options["go"])
+	}
+	if emitValue, ok := goConfig["emit"].(bool); !ok || !emitValue {
+		t.Fatalf("expected go emit true, got %#v", goConfig["emit"])
+	}
+}
+
+func writeConfigFile(t *testing.T, path string, content string) {
+	t.Helper()
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
+		t.Fatalf("failed to write %s: %v", path, err)
 	}
 }

@@ -1,0 +1,54 @@
+{
+  "db2pdl": {
+    "enabled": true,
+    "verbose": false,
+    "connection": {
+      "type": "mysql",
+      "host": "${DB_HOST}",
+      "port": "${DB_PORT}",
+      "user": "${DB_USERNAME}",
+      "password": "${DB_PASSWORD}",
+      "database": "${DB_DATABASE}"
+    },
+    "outputDir": "${PDL_DB2PDL_OUTPUT}",
+    "templatesDir": "default",
+    "ts": {
+      "emit": false
+    },
+    "js": {
+      "emit": false
+    },
+    "cs": {
+      "emit": false
+    },
+    "go": {
+      "emit": true,
+      "package": ""
+    },
+    "java": {
+      "emit": false
+    },
+    "kotlin": {
+      "emit": false
+    },
+    "rust": {
+      "emit": false
+    },
+    "cpp": {
+      "emit": false
+    },
+    "python": {
+      "emit": false
+    },
+    "php": {
+      "emit": true
+    },
+    "pdl": {
+      "db2PdlSourceDest": "com/mh/mimanjar/domain/data",
+      "entitiesNamespace": "com.mh.mimanjar.domain.data",
+      "useNamespaces": []
+    },
+    "excludedTables": [],
+    "excludedColumns": []
+  }
+}

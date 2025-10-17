@@ -5,6 +5,7 @@ Thumbs.db
 .DS_Store
 logs/
 full-demo/
+sample-project/sample-legacy-orm-output
 sample-project2/
 sample-project3/
 .vscode/

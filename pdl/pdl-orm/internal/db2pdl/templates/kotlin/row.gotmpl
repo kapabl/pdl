@@ -1,0 +1,159 @@
+{{- $table := .Table }}
+package {{ $table.KotlinPackage }}
+
+{{- range .Imports }}
+import {{ . }}
+{{- end }}
+
+class {{ $table.RowClass }} : Row("{{ $table.TableName }}", "{{ $table.PrimaryKeyOriginal }}") {
+{{- range $table.FieldsInfo }}
+
+    @field:PdlColumn(name = "{{ .Original }}"{{ if .IsPrimaryKey }}, primaryKey = true{{ end }}{{ if .IsAutoIncrement }}, autoIncrement = true{{ end }})
+    var {{ .CamelCase }}: {{ .KotlinType }}? = null
+{{- end }}
+
+    @Throws(Exception::class)
+    fun create() = RowExecutor.create(this)
+
+    @Throws(Exception::class)
+    fun update() = RowExecutor.update(this)
+
+    @Throws(Exception::class)
+    fun delete() = RowExecutor.delete(this)
+
+    companion object {
+        @JvmStatic
+        fun newRecord(): {{ $table.RowClass }} = {{ $table.RowClass }}()
+
+        @JvmStatic
+        fun where(): {{ $table.WhereClass }} = {{ $table.WhereClass }}(QueryBuilder.table("{{ $table.TableName }}"))
+
+        @JvmStatic
+        fun columnList(): List<String> {
+            val result = mutableListOf<String>()
+{{- range $table.FieldsInfo }}
+            result.add("{{ .Original }}")
+{{- end }}
+            return result
+        }
+    }
+}
+
+class {{ $table.WhereClass }} internal constructor(private val builder: QueryBuilder) {
+
+    fun withStore(store: DBStore): {{ $table.WhereClass }} {
+        builder.withStore(store)
+        return this
+    }
+
+    fun project(vararg columns: String): {{ $table.WhereClass }} {
+        builder.project(*columns)
+        return this
+    }
+
+    fun fieldList(vararg columns: String): {{ $table.WhereClass }} = project(*columns)
+
+    fun offset(value: Int): {{ $table.WhereClass }} {
+        builder.offset(value)
+        return this
+    }
+
+    fun limit(value: Int): {{ $table.WhereClass }} {
+        builder.limit(value)
+        return this
+    }
+
+    fun range(offset: Int, limit: Int): {{ $table.WhereClass }} {
+        builder.range(offset, limit)
+        return this
+    }
+
+    fun orderBy(): {{ $table.OrderByClass }} = {{ $table.OrderByClass }}(this)
+{{- range $table.FieldsInfo }}
+
+    fun {{ .PascalCase }}(value: {{ .KotlinType }}): {{ $table.WhereClass }} {
+        builder.filter("{{ .Original }}", Operator.EQ, value)
+        return this
+    }
+{{- end }}
+
+    @Throws(Exception::class)
+    fun load(): List<Map<String, Any?>> = builder.load()
+
+    @Throws(Exception::class)
+    fun loadRows(): List<{{ $table.RowClass }}> {
+        val rows = load()
+        val result = mutableListOf<{{ $table.RowClass }}>()
+        for (entry in rows) {
+            val record = {{ $table.RowClass }}()
+            RowExecutor.hydrate(record, entry)
+            result.add(record)
+        }
+        return result
+    }
+
+    @Throws(Exception::class)
+    fun delete() {
+        builder.delete("{{ $table.PrimaryKeyOriginal }}")
+    }
+
+    internal fun internalBuilder(): QueryBuilder = builder
+}
+
+class {{ $table.OrderByClass }} internal constructor(private val where: {{ $table.WhereClass }}) {
+{{- range $table.FieldsInfo }}
+
+    fun {{ .PascalCase }}(): {{ $table.OrderByClass }}Direction =
+        {{ $table.OrderByClass }}Direction(this, "{{ .Original }}")
+{{- end }}
+
+    fun project(vararg columns: String): {{ $table.WhereClass }} = where.project(*columns)
+
+    fun fieldList(vararg columns: String): {{ $table.WhereClass }} = where.fieldList(*columns)
+
+    fun offset(value: Int): {{ $table.WhereClass }} = where.offset(value)
+
+    fun limit(value: Int): {{ $table.WhereClass }} = where.limit(value)
+
+    fun range(offset: Int, limit: Int): {{ $table.WhereClass }} = where.range(offset, limit)
+
+    @Throws(Exception::class)
+    fun load(): List<Map<String, Any?>> = where.load()
+
+    @Throws(Exception::class)
+    fun loadRows(): List<{{ $table.RowClass }}> = where.loadRows()
+
+    @Throws(Exception::class)
+    fun delete() = where.delete()
+
+    internal fun builder(): QueryBuilder = where.internalBuilder()
+}
+
+class {{ $table.OrderByClass }}Direction internal constructor(
+    private val order: {{ $table.OrderByClass }},
+    private val column: String
+) {
+    fun asc(): {{ $table.OrderByClass }} {
+        order.builder().asc(column)
+        return order
+    }
+
+    fun desc(): {{ $table.OrderByClass }} {
+        order.builder().desc(column)
+        return order
+    }
+}
+
+object {{ $table.ColumnsDefinitionClass }} {
+{{- range $table.FieldsInfo }}
+
+    const val {{ .PascalCase }}: String = "{{ .Original }}"
+{{- end }}
+}
+
+object {{ $table.OrderByClass }}Columns {
+{{- range $table.FieldsInfo }}
+
+    const val {{ .PascalCase }}: String = "{{ .Original }}"
+{{- end }}
+}

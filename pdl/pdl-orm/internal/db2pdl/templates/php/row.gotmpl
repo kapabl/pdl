@@ -1,0 +1,253 @@
+{{- $table := .Data }}
+<?php
+
+namespace {{ $table.PhpEntitiesNamespace }};
+
+use Io\Pdl\Infrastructure\Data\DBStore;
+use Io\Pdl\Infrastructure\Data\Operator;
+use Io\Pdl\Infrastructure\Data\OrderDirection;
+use Io\Pdl\Infrastructure\Data\QueryBuilder;
+use Io\Pdl\Infrastructure\Data\Row;
+use Io\Pdl\Infrastructure\Data\RowExecutor;
+
+class {{ $table.RowClass }} extends Row
+{
+    public const TABLE = '{{ $table.TableName }}';
+    public const PRIMARY_KEY = '{{ $table.PrimaryKeyOriginal }}';
+    private const COLUMN_MAP = [
+{{- range $table.FieldsInfo }}
+        '{{ .CamelCase }}' => '{{ .Original }}',
+{{- end }}
+    ];
+
+{{- range $table.FieldsInfo }}
+    public ?{{ .PhpType }} ${{ .CamelCase }} = null;
+{{- end }}
+
+    public function __construct(?DBStore $store = null)
+    {
+        parent::__construct(self::TABLE, self::PRIMARY_KEY, self::COLUMN_MAP, $store);
+    }
+
+    public static function newRecord(?DBStore $store = null): self
+    {
+        return new self($store);
+    }
+
+    public static function where(?DBStore $store = null): {{ $table.WhereClass }}
+    {
+        return new {{ $table.WhereClass }}(new QueryBuilder(self::TABLE, $store), self::COLUMN_MAP, static::class, self::PRIMARY_KEY);
+    }
+
+    public static function columnList(): array
+    {
+        return {{ $table.ColumnsDefinitionClass }}::list();
+    }
+
+    public static function orderColumns(): array
+    {
+        return {{ $table.OrderByClass }}::list();
+    }
+
+    public function create(): void
+    {
+        RowExecutor::create($this);
+    }
+
+    public function update(): void
+    {
+        RowExecutor::update($this);
+    }
+
+    public function delete(): void
+    {
+        RowExecutor::delete($this);
+    }
+}
+
+class {{ $table.WhereClass }}
+{
+    public function __construct(
+        private QueryBuilder $builder,
+        private array $columnMap,
+        private string $rowClass,
+        private string $primaryKey
+    ) {
+    }
+
+    public function project(string ...$columns): self
+    {
+        $this->builder->project(...$columns);
+        return $this;
+    }
+
+    public function fieldList(string ...$columns): self
+    {
+        return $this->project(...$columns);
+    }
+
+    public function offset(int $value): self
+    {
+        $this->builder->offset($value);
+        return $this;
+    }
+
+    public function limit(int $value): self
+    {
+        $this->builder->limit($value);
+        return $this;
+    }
+
+    public function range(int $offset, int $limit): self
+    {
+        $this->builder->range($offset, $limit);
+        return $this;
+    }
+
+    public function orderBy(): {{ $table.OrderByClass }}
+    {
+        return new {{ $table.OrderByClass }}($this);
+    }
+
+{{- range $table.FieldsInfo }}
+    public function {{ .PascalCase }}({{ if ne .PhpType "mixed" }}?{{ .PhpType }} {{ end }}$value): self
+    {
+        $this->builder->filter('{{ .Original }}', Operator::EQ, $value);
+        return $this;
+    }
+{{- end }}
+
+    public function load(): array
+    {
+        return $this->builder->load();
+    }
+
+    public function loadRows(): array
+    {
+        $rows = $this->load();
+        $result = [];
+        foreach ($rows as $entry) {
+            /** @var {{ $table.RowClass }} $record */
+            $record = $this->rowClass::newRecord();
+            RowExecutor::hydrate($record, $entry);
+            $result[] = $record;
+        }
+        return $result;
+    }
+
+    public function delete(): void
+    {
+        $this->builder->delete($this->primaryKey);
+    }
+
+    public function builder(): QueryBuilder
+    {
+        return $this->builder;
+    }
+}
+
+class {{ $table.OrderByClass }}
+{
+    public function __construct(private {{ $table.WhereClass }} $where)
+    {
+    }
+
+{{- range $table.FieldsInfo }}
+    public function {{ .PascalCase }}(): {{ $table.OrderByClass }}Direction
+    {
+        return new {{ $table.OrderByClass }}Direction($this, '{{ .Original }}');
+    }
+{{- end }}
+
+    public function project(string ...$columns): {{ $table.WhereClass }}
+    {
+        return $this->where->project(...$columns);
+    }
+
+    public function fieldList(string ...$columns): {{ $table.WhereClass }}
+    {
+        return $this->where->fieldList(...$columns);
+    }
+
+    public function offset(int $value): {{ $table.WhereClass }}
+    {
+        return $this->where->offset($value);
+    }
+
+    public function limit(int $value): {{ $table.WhereClass }}
+    {
+        return $this->where->limit($value);
+    }
+
+    public function range(int $offset, int $limit): {{ $table.WhereClass }}
+    {
+        return $this->where->range($offset, $limit);
+    }
+
+    public function load(): array
+    {
+        return $this->where->load();
+    }
+
+    public function loadRows(): array
+    {
+        return $this->where->loadRows();
+    }
+
+    public function delete(): void
+    {
+        $this->where->delete();
+    }
+
+    public function where(): {{ $table.WhereClass }}
+    {
+        return $this->where;
+    }
+}
+
+class {{ $table.OrderByClass }}Direction
+{
+    public function __construct(private {{ $table.OrderByClass }} $order, private string $column)
+    {
+    }
+
+    public function asc(): {{ $table.OrderByClass }}
+    {
+        $this->order->where()->builder()->orderBy($this->column, OrderDirection::ASC);
+        return $this->order;
+    }
+
+    public function desc(): {{ $table.OrderByClass }}
+    {
+        $this->order->where()->builder()->orderBy($this->column, OrderDirection::DESC);
+        return $this->order;
+    }
+}
+
+final class {{ $table.ColumnsDefinitionClass }}
+{
+{{- range $table.FieldsInfo }}
+    public const {{ upperSnake .PascalCase }} = '{{ .Original }}';
+{{- end }}
+
+    public static function list(): array
+    {
+        return [
+{{- range $table.FieldsInfo }}
+            '{{ .Original }}',
+{{- end }}
+        ];
+    }
+}
+
+final class {{ $table.ColumnsListTraits }}
+{
+{{- range $table.FieldsInfo }}
+    public const {{ upperSnake .PascalCase }} = '{{ .Original }}';
+{{- end }}
+
+    public static function list(): array
+    {
+        return {{ $table.ColumnsDefinitionClass }}::list();
+    }
+}

@@ -10,6 +10,11 @@ type FieldInfo struct {
 	DbType          string `json:"dbType"`
 	PhpType         string `json:"phpType"`
 	PdlType         string `json:"pdlType"`
+	CSharpType      string `json:"csharpType"`
+	JavaType        string `json:"javaType"`
+	KotlinType      string `json:"kotlinType"`
+	CppType         string `json:"cppType"`
+	RustType        string `json:"rustType"`
 	PhpAttributes   string `json:"phpAttributes"`
 	PdlAttributes   string `json:"pdlAttributes"`
 	GoType          string `json:"goType"`
@@ -22,6 +27,7 @@ type TableData struct {
 	Name                   string      `json:"name"`
 	TableName              string      `json:"tableName"`
 	DbName                 string      `json:"dbName"`
+	DatabaseDriver         string      `json:"databaseDriver"`
 	PdlRowClass            string      `json:"pdlRowClass"`
 	RowClass               string      `json:"rowClass"`
 	GoStruct               string      `json:"goStruct"`
@@ -35,6 +41,8 @@ type TableData struct {
 	PhpUseNamespaces       string      `json:"phpUseNamespaces"`
 	PhpEntitiesNamespace   string      `json:"phpEntitiesNamespace"`
 	PdlEntitiesNamespace   string      `json:"pdlEntitiesNamespace"`
+	JavaPackage            string      `json:"javaPackage"`
+	KotlinPackage          string      `json:"kotlinPackage"`
 	PdlUseNamespaces       []string    `json:"pdlUseNamespaces"`
 	PrimaryKeyPascalCase   string      `json:"primaryKeyPascalCase"`
 	PrimaryKeyCamelCase    string      `json:"primaryKeyCamelCase"`

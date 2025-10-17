@@ -1,0 +1,215 @@
+{{- $table := .Table }}
+package {{ $table.JavaPackage }};
+
+{{- range .Imports }}
+import {{ . }};
+{{- end }}
+
+public class {{ $table.RowClass }} extends Row {
+{{- range $table.FieldsInfo }}
+
+    @PdlColumn(name = "{{ .Original }}"{{ if .IsPrimaryKey }}, primaryKey = true{{ end }}{{ if .IsAutoIncrement }}, autoIncrement = true{{ end }})
+    private {{ .JavaType }} {{ .CamelCase }};
+{{- end }}
+
+    public {{ $table.RowClass }}() {
+        super("{{ $table.TableName }}", "{{ $table.PrimaryKeyOriginal }}");
+    }
+{{- range $table.FieldsInfo }}
+
+    public {{ .JavaType }} get{{ .PascalCase }}() {
+        return this.{{ .CamelCase }};
+    }
+
+    public void set{{ .PascalCase }}({{ .JavaType }} value) {
+        this.{{ .CamelCase }} = value;
+    }
+{{- end }}
+
+    public void create() throws Exception {
+        RowExecutor.create(this);
+    }
+
+    public void update() throws Exception {
+        RowExecutor.update(this);
+    }
+
+    public void delete() throws Exception {
+        RowExecutor.delete(this);
+    }
+
+    public static {{ $table.RowClass }} newRecord() {
+        return new {{ $table.RowClass }}();
+    }
+
+    public static {{ $table.WhereClass }} where() {
+        return new {{ $table.WhereClass }}(QueryBuilder.table("{{ $table.TableName }}"));
+    }
+
+    public static List<String> columnList() {
+        List<String> result = new ArrayList<>();
+{{- range $table.FieldsInfo }}
+        result.add("{{ .Original }}");
+{{- end }}
+        return result;
+    }
+}
+
+public final class {{ $table.WhereClass }} {
+    private final QueryBuilder builder;
+
+    {{ $table.WhereClass }}(QueryBuilder builder) {
+        this.builder = builder;
+    }
+
+    public {{ $table.WhereClass }} withStore(DBStore store) {
+        builder.withStore(store);
+        return this;
+    }
+
+    public {{ $table.WhereClass }} project(String... columns) {
+        builder.project(columns);
+        return this;
+    }
+
+    public {{ $table.WhereClass }} fieldList(String... columns) {
+        return project(columns);
+    }
+
+    public {{ $table.WhereClass }} offset(int value) {
+        builder.offset(value);
+        return this;
+    }
+
+    public {{ $table.WhereClass }} limit(int value) {
+        builder.limit(value);
+        return this;
+    }
+
+    public {{ $table.WhereClass }} range(int offset, int limit) {
+        builder.range(offset, limit);
+        return this;
+    }
+
+    public {{ $table.OrderByClass }} orderBy() {
+        return new {{ $table.OrderByClass }}(this);
+    }
+{{- range $table.FieldsInfo }}
+
+    public {{ $table.WhereClass }} {{ .PascalCase }}({{ .JavaType }} value) {
+        builder.filter("{{ .Original }}", Operator.EQ, value);
+        return this;
+    }
+{{- end }}
+
+    public List<Map<String, Object>> load() throws Exception {
+        return builder.load();
+    }
+
+    public List<{{ $table.RowClass }}> loadRows() throws Exception {
+        List<Map<String, Object>> rows = load();
+        List<{{ $table.RowClass }}> result = new ArrayList<>(rows.size());
+        for (Map<String, Object> entry : rows) {
+            {{ $table.RowClass }} record = new {{ $table.RowClass }}();
+            RowExecutor.hydrate(record, entry);
+            result.add(record);
+        }
+        return result;
+    }
+
+    public void delete() throws Exception {
+        builder.delete("{{ $table.PrimaryKeyOriginal }}");
+    }
+
+    QueryBuilder builder() {
+        return builder;
+    }
+}
+
+public final class {{ $table.OrderByClass }} {
+    private final {{ $table.WhereClass }} where;
+
+    {{ $table.OrderByClass }}({{ $table.WhereClass }} where) {
+        this.where = where;
+    }
+{{- range $table.FieldsInfo }}
+
+    public {{ $table.OrderByClass }}Direction {{ .PascalCase }}() {
+        return new {{ $table.OrderByClass }}Direction(this, "{{ .Original }}");
+    }
+{{- end }}
+
+    public {{ $table.WhereClass }} project(String... columns) {
+        return where.project(columns);
+    }
+
+    public {{ $table.WhereClass }} fieldList(String... columns) {
+        return where.fieldList(columns);
+    }
+
+    public {{ $table.WhereClass }} offset(int value) {
+        return where.offset(value);
+    }
+
+    public {{ $table.WhereClass }} limit(int value) {
+        return where.limit(value);
+    }
+
+    public {{ $table.WhereClass }} range(int offset, int limit) {
+        return where.range(offset, limit);
+    }
+
+    public List<Map<String, Object>> load() throws Exception {
+        return where.load();
+    }
+
+    public List<{{ $table.RowClass }}> loadRows() throws Exception {
+        return where.loadRows();
+    }
+
+    public void delete() throws Exception {
+        where.delete();
+    }
+
+    QueryBuilder builder() {
+        return where.builder();
+    }
+}
+
+public final class {{ $table.OrderByClass }}Direction {
+    private final {{ $table.OrderByClass }} order;
+    private final String column;
+
+    {{ $table.OrderByClass }}Direction({{ $table.OrderByClass }} order, String column) {
+        this.order = order;
+        this.column = column;
+    }
+
+    public {{ $table.OrderByClass }} asc() {
+        order.builder().asc(column);
+        return order;
+    }
+
+    public {{ $table.OrderByClass }} desc() {
+        order.builder().desc(column);
+        return order;
+    }
+}
+
+public final class {{ $table.ColumnsDefinitionClass }} {
+    private {{ $table.ColumnsDefinitionClass }}() {
+    }
+{{- range $table.FieldsInfo }}
+
+    public static final String {{ .PascalCase }} = "{{ .Original }}";
+{{- end }}
+}
+
+public final class {{ $table.OrderByClass }}Columns {
+    private {{ $table.OrderByClass }}Columns() {
+    }
+{{- range $table.FieldsInfo }}
+
+    public static final String {{ .PascalCase }} = "{{ .Original }}";
+{{- end }}
+}

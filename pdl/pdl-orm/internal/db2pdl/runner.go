@@ -9,6 +9,15 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
+	cpptarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/cpp"
+	csharptarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/csharp"
+	gotarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/go"
+	javatarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/java"
+	kotlintarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/kotlin"
+	pdltarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/pdl"
+	phtarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/php"
+	rusttarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/rust"
+	tstarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/typescript"
 	_ "github.com/lib/pq"
 )
 
@@ -64,11 +73,22 @@ func (runner Runner) Run(ctx context.Context) error {
 	}
 	defer sqlConnection.Close()
 	stats := executionStats{}
+	writer := func(language string, fileName string, source string) error {
+		return runner.outputCode(source, fileName, language, dbConfig.OutputDir, &stats, verbosePrinter)
+	}
+	pdlGenerator := pdltarget.New(templateUtils, writer)
+	phpGenerator := phtarget.New(templateUtils, writer)
+	tsGenerator := tstarget.New(templateUtils, writer)
+	goGenerator := gotarget.New(templateUtils, writer, dbConfig)
+	csGenerator := csharptarget.New(templateUtils, writer)
+	cppGenerator := cpptarget.New(templateUtils, writer)
+	javaGenerator := javatarget.New(templateUtils, writer)
+	kotlinGenerator := kotlintarget.New(templateUtils, writer)
+	rustGenerator := rusttarget.New(templateUtils, writer)
 	tables, tablesErr := driver.ListTables(ctx, sqlConnection)
 	if tablesErr != nil {
 		return tablesErr
 	}
-	typeScriptBlocks := make([]string, 0)
 	for _, tableName := range tables {
 		if ContainsCaseSensitive(dbConfig.ExcludedTables, tableName) {
 			continue
@@ -83,117 +103,57 @@ func (runner Runner) Run(ctx context.Context) error {
 			return result
 		}
 		stats.totalTables++
-		generateErr := runner.generateClasses(templateUtils, dbConfig, tableData, &stats, &typeScriptBlocks, verbosePrinter)
-		if generateErr != nil {
-			result = generateErr
-			return result
+		if err := pdlGenerator.Generate(tableData); err != nil {
+			return err
+		}
+		if dbConfig.PHP.EmitHelpers {
+			if err := phpGenerator.Generate(tableData); err != nil {
+				return err
+			}
+		}
+		if dbConfig.TypeScript.Emit {
+			if err := tsGenerator.AddTable(tableData); err != nil {
+				return err
+			}
+		}
+		if dbConfig.Go.Emit {
+			if err := goGenerator.Generate(tableData); err != nil {
+				return err
+			}
+		}
+		if dbConfig.Java.Emit {
+			if err := javaGenerator.Generate(tableData); err != nil {
+				return err
+			}
+		}
+		if dbConfig.Kotlin.Emit {
+			if err := kotlinGenerator.Generate(tableData); err != nil {
+				return err
+			}
+		}
+		if dbConfig.CSharp.Emit {
+			if err := csGenerator.Generate(tableData); err != nil {
+				return err
+			}
+		}
+		if dbConfig.Cpp.Emit {
+			if err := cppGenerator.Generate(tableData); err != nil {
+				return err
+			}
+		}
+		if dbConfig.Rust.Emit {
+			if err := rustGenerator.Generate(tableData); err != nil {
+				return err
+			}
 		}
 	}
-	finishErr := runner.finishGeneration(templateUtils, dbConfig, typeScriptBlocks, &stats, verbosePrinter)
+	finishErr := runner.finishGeneration(dbConfig, tsGenerator, &stats, verbosePrinter)
 	if finishErr != nil {
 		result = finishErr
 		return result
 	}
 	if runner.ExitWhenDone {
 		os.Exit(0)
-	}
-	result = nil
-	return result
-}
-
-func (runner Runner) generateClasses(templateUtils *TemplateUtils, mysqlConfig DB2PDLConfig, tableData TableData, stats *executionStats, typeScriptBlocks *[]string, verbosePrinter VerbosePrinter) error {
-	var result error
-	pdlSource, pdlErr := templateUtils.Render(filepath.Join("pdl", "pdlRowClass"), tableData)
-	if pdlErr != nil {
-		result = pdlErr
-		return result
-	}
-	pdlOutputErr := runner.outputCode(pdlSource, tableData.PdlRowClass, "pdl", mysqlConfig.OutputDir, stats, verbosePrinter)
-	if pdlOutputErr != nil {
-		result = pdlOutputErr
-		return result
-	}
-	if mysqlConfig.PHP.EmitHelpers {
-		phpTemplates := []struct {
-			Template string
-			FileName string
-		}{
-			{Template: filepath.Join("php", "rowClass"), FileName: tableData.RowClass},
-			{Template: filepath.Join("php", "columnsDefinitionClass"), FileName: tableData.ColumnsDefinitionClass},
-			{Template: filepath.Join("php", "whereClass"), FileName: tableData.WhereClass},
-			{Template: filepath.Join("php", "orderByClass"), FileName: tableData.OrderByClass},
-			{Template: filepath.Join("php", "columnsListTraits"), FileName: tableData.ColumnsListTraits},
-			{Template: filepath.Join("php", "fieldListClass"), FileName: tableData.FieldListClass},
-		}
-		for _, entry := range phpTemplates {
-			phpSource, phpErr := templateUtils.Render(entry.Template, tableData)
-			if phpErr != nil {
-				result = phpErr
-				return result
-			}
-			phpOutputErr := runner.outputCode(phpSource, entry.FileName, "php", mysqlConfig.OutputDir, stats, verbosePrinter)
-			if phpOutputErr != nil {
-				result = phpOutputErr
-				return result
-			}
-		}
-	}
-	if mysqlConfig.TypeScript.Emit {
-		tsSource, tsErr := templateUtils.Render(filepath.Join("ts", "dbBlock"), tableData)
-		if tsErr != nil {
-			result = tsErr
-			return result
-		}
-		*typeScriptBlocks = append(*typeScriptBlocks, tsSource)
-	}
-	if mysqlConfig.Go.Emit {
-		additionalImports := make([]string, 0)
-		for _, importPath := range tableData.GoImports {
-			if importPath == "github.com/kapablanka/pdl/pdl/infra/go" {
-				continue
-			}
-			additionalImports = append(additionalImports, importPath)
-		}
-		goNamespacePath := NamespaceToGoPath(tableData.PdlEntitiesNamespace)
-		goPackageName := NamespaceToGoPackage(tableData.PdlEntitiesNamespace)
-		if goPackageName == "" {
-			goPackageName = strings.ToLower(mysqlConfig.Go.Package)
-		}
-		relativeFileName := tableData.TableName
-		if goNamespacePath != "" {
-			relativeFileName = filepath.Join(goNamespacePath, tableData.TableName)
-		}
-		goPayload := struct {
-			TableData
-			GoPackage         string   `json:"goPackage"`
-			AdditionalImports []string `json:"additionalImports"`
-		}{
-			TableData:         tableData,
-			GoPackage:         goPackageName,
-			AdditionalImports: additionalImports,
-		}
-		goSource, goErr := templateUtils.Render(filepath.Join("go", "row"), goPayload)
-		if goErr != nil {
-			result = goErr
-			return result
-		}
-		goOutputErr := runner.outputCode(goSource, relativeFileName, "go", mysqlConfig.OutputDir, stats, verbosePrinter)
-		if goOutputErr != nil {
-			result = goOutputErr
-			return result
-		}
-	}
-	if mysqlConfig.CSharp.Emit {
-		csSource, csErr := templateUtils.Render(filepath.Join("cs", "csharpRowSetClass"), tableData)
-		if csErr != nil {
-			result = csErr
-			return result
-		}
-		csOutputErr := runner.outputCode(csSource, tableData.CsharpRowSetClass, "cs", mysqlConfig.OutputDir, stats, verbosePrinter)
-		if csOutputErr != nil {
-			result = csOutputErr
-			return result
-		}
 	}
 	result = nil
 	return result
@@ -232,28 +192,16 @@ func (runner Runner) outputCode(source string, fileName string, language string,
 	return result
 }
 
-func (runner Runner) finishGeneration(templateUtils *TemplateUtils, mysqlConfig DB2PDLConfig, typeScriptBlocks []string, stats *executionStats, verbosePrinter VerbosePrinter) error {
-	var result error
-	if mysqlConfig.TypeScript.Emit && len(typeScriptBlocks) > 0 {
-		payload := map[string]interface{}{
-			"source": strings.Join(typeScriptBlocks, "\n"),
-		}
-		tsSource, tsErr := templateUtils.Render(filepath.Join("ts", "dbModule"), payload)
-		if tsErr != nil {
-			result = tsErr
-			return result
-		}
-		tsOutputErr := runner.outputCode(tsSource, mysqlConfig.TypeScript.OutputFile, "ts", mysqlConfig.OutputDir, stats, verbosePrinter)
-		if tsOutputErr != nil {
-			result = tsOutputErr
-			return result
+func (runner Runner) finishGeneration(mysqlConfig DB2PDLConfig, tsGenerator *tstarget.Generator, stats *executionStats, verbosePrinter VerbosePrinter) error {
+	if mysqlConfig.TypeScript.Emit && tsGenerator != nil {
+		if err := tsGenerator.Flush(mysqlConfig.TypeScript.OutputFile); err != nil {
+			return err
 		}
 	}
 	summary := fmt.Sprintf("Stats: %s files generated, %s lines generated, %s bytes", strconv.Itoa(stats.totalFiles), strconv.Itoa(stats.totalLines), strconv.FormatInt(stats.totalSize, 10))
 	fmt.Printf("Output dir: %s\n", mysqlConfig.OutputDir)
 	fmt.Println(summary)
-	result = nil
-	return result
+	return nil
 }
 
 func calculateNamespaces(config DB2PDLConfig) (string, string) {

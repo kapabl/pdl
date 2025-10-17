@@ -8,10 +8,6 @@
     "dir": "${PDL_TEMPLATES_DIR}",
     "name": "classTemplate1"
   },
-  "db2pdl": {
-    "enabled": true,
-    "db2PdlSourceDest": "com/mh/mimanjar/domain/data"
-  },
   "src": [
     "src"
   ],
