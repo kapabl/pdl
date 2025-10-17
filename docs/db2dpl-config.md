@@ -43,7 +43,8 @@ Store the following JSON in `pdl.db2pdl.config.json` in the same directory as yo
       "emit": false
     },
     "python": {
-      "emit": false
+      "emit": false,
+      "package": ""
     },
     "php": {
       "emit": true

@@ -37,6 +37,7 @@ var builtinProfileGenerators = map[string]profileGeneratorSpec{
 	"kotlin": {name: "kotlin"},
 	"rust":   {name: "rust"},
 	"cpp":    {name: "cpp"},
+	"python": {name: "python"},
 }
 
 func (executor pipelineExecutor) runAstGenerators() error {

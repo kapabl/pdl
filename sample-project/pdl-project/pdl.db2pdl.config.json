@@ -38,7 +38,8 @@
       "emit": false
     },
     "python": {
-      "emit": false
+      "emit": false,
+      "package": ""
     },
     "php": {
       "emit": true

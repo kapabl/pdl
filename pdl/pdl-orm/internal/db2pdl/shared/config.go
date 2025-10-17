@@ -50,6 +50,11 @@ type KotlinConfig struct {
 	Package string `json:"package"`
 }
 
+type PythonConfig struct {
+	Emit    bool   `json:"emit"`
+	Package string `json:"package"`
+}
+
 type RustConfig struct {
 	Emit bool `json:"emit"`
 }
@@ -76,6 +81,7 @@ type DB2PDLConfig struct {
 	TypeScript      TypeScriptConfig `json:"ts"`
 	Java            JavaConfig       `json:"java"`
 	Kotlin          KotlinConfig     `json:"kotlin"`
+	Python          PythonConfig     `json:"python"`
 	Rust            RustConfig       `json:"rust"`
 	Cpp             CppConfig        `json:"cpp"`
 	CSharp          CSConfig         `json:"cs"`

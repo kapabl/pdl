@@ -64,6 +64,9 @@ The `profiles` object declares each generator you want to run.
   },
   "php": {
     "enabled": true
+  },
+  "python": {
+    "enabled": true
   }
 }
 ```
@@ -74,7 +77,7 @@ Key points:
 - Each profile inherits the top-level template settings and `outputDir/<language>` by default. Any value you provide inside the profile (`templates.dir`, `templates.name`, additional flags like `generateAsObject`) overrides just that field.
 - Additional profile-specific fields are simply forwarded to the generator—no extra config scaffolding is required.
 
-The CLI currently supports inhibitors for the standard generators (`ts`, `js`, `go`, `php`, `csharp`, `java`). Custom generators can read the same structure.
+The CLI currently supports inhibitors for the standard generators (`ts`, `js`, `go`, `php`, `python`, `csharp`, `java`). Custom generators can read the same structure.
 
 ---
 

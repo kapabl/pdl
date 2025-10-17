@@ -6,6 +6,7 @@ type FieldInfo struct {
 	Original        string `json:"original"`
 	SnakeCase       string `json:"snakeCase"`
 	PascalCase      string `json:"pascalCase"`
+	PythonType      string `json:"pythonType"`
 	TsType          string `json:"tsType"`
 	DbType          string `json:"dbType"`
 	PhpType         string `json:"phpType"`
@@ -35,6 +36,7 @@ type TableData struct {
 	ColumnsDefinitionClass string      `json:"columnsDefinitionClass"`
 	WhereClass             string      `json:"whereClass"`
 	OrderByClass           string      `json:"orderByClass"`
+	PythonPackage          string      `json:"pythonPackage"`
 	FieldListClass         string      `json:"fieldListClass"`
 	ColumnsListTraits      string      `json:"columnsListTraits"`
 	CsharpRowSetClass      string      `json:"csharpRowSetClass"`

@@ -16,6 +16,7 @@ import (
 	kotlintarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/kotlin"
 	pdltarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/pdl"
 	phtarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/php"
+	pythontarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/python"
 	rusttarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/rust"
 	tstarget "github.com/kapablanka/pdl/pdl-orm/internal/db2pdl/generator/typescript"
 	_ "github.com/lib/pq"
@@ -84,6 +85,7 @@ func (runner Runner) Run(ctx context.Context) error {
 	cppGenerator := cpptarget.New(templateUtils, writer)
 	javaGenerator := javatarget.New(templateUtils, writer)
 	kotlinGenerator := kotlintarget.New(templateUtils, writer)
+	pythonGenerator := pythontarget.New(templateUtils, writer, dbConfig)
 	rustGenerator := rusttarget.New(templateUtils, writer)
 	tables, tablesErr := driver.ListTables(ctx, sqlConnection)
 	if tablesErr != nil {
@@ -143,6 +145,11 @@ func (runner Runner) Run(ctx context.Context) error {
 		}
 		if dbConfig.Rust.Emit {
 			if err := rustGenerator.Generate(tableData); err != nil {
+				return err
+			}
+		}
+		if dbConfig.Python.Emit {
+			if err := pythonGenerator.Generate(tableData); err != nil {
 				return err
 			}
 		}

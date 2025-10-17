@@ -13,6 +13,7 @@ import (
 	_ "github.com/kapablanka/pdl/pdl/internal/generator/javascript"
 	_ "github.com/kapablanka/pdl/pdl/internal/generator/kotlin"
 	_ "github.com/kapablanka/pdl/pdl/internal/generator/php"
+	_ "github.com/kapablanka/pdl/pdl/internal/generator/python"
 	_ "github.com/kapablanka/pdl/pdl/internal/generator/rust"
 	_ "github.com/kapablanka/pdl/pdl/internal/generator/typescript"
 )

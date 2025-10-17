@@ -198,6 +198,10 @@ func ComposeTableData(baseName string, tableName string, config DB2PDLConfig, de
 	if kotlinPackage == "" {
 		kotlinPackage = baseNamespace
 	}
+	pythonPackage := strings.TrimSpace(config.Python.Package)
+	if pythonPackage == "" {
+		pythonPackage = strings.ReplaceAll(defaultNamespace, "/", ".")
+	}
 	driverType := strings.ToLower(config.Connection.Type)
 	result := TableData{
 		Name:                   baseName,
@@ -211,6 +215,7 @@ func ComposeTableData(baseName string, tableName string, config DB2PDLConfig, de
 		ColumnsDefinitionClass: baseName + "Columns",
 		WhereClass:             baseName + "Where",
 		OrderByClass:           baseName + "OrderBy",
+		PythonPackage:          pythonPackage,
 		FieldListClass:         baseName + "FieldList",
 		ColumnsListTraits:      baseName + "ColumnsTraits",
 		CsharpRowSetClass:      baseName + "RowSet",

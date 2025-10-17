@@ -1,0 +1,198 @@
+{{- $payload := .Data }}
+{{- $table := $payload.Table }}
+{{- $imports := $payload.Imports }}
+from __future__ import annotations
+
+from typing import Any, Dict, Iterable, List, Optional, Type
+
+from pdlinfra.infrastructure.data import (
+    DBStore,
+    Operator,
+    OrderDirection,
+    QueryBuilder,
+    Row,
+    RowExecutor,
+    hydrate,
+)
+{{- if $imports.NeedsDatetime }}
+import datetime
+{{- end }}
+{{- if $imports.NeedsDecimal }}
+from decimal import Decimal
+{{- end }}
+{{- if $imports.NeedsUUID }}
+from uuid import UUID
+{{- end }}
+
+
+class {{ $table.RowClass }}(Row):
+    TABLE = "{{ $table.TableName }}"
+    PRIMARY_KEY = "{{ $table.PrimaryKeyOriginal }}"
+    COLUMN_MAP: Dict[str, str] = {
+{{- range $table.FieldsInfo }}
+        "{{ .SnakeCase }}": "{{ .Original }}",
+{{- end }}
+    }
+
+    def __init__(self, store: Optional[DBStore] = None) -> None:
+        super().__init__(self.TABLE, self.PRIMARY_KEY, self.COLUMN_MAP, store=store)
+{{- range $table.FieldsInfo }}
+        self.{{ .SnakeCase }}: Optional[{{ .PythonType }}] = None
+{{- end }}
+
+    @classmethod
+    def new(cls, store: Optional[DBStore] = None) -> "{{ $table.RowClass }}":
+        return cls(store)
+
+    @classmethod
+    def where(cls, store: Optional[DBStore] = None) -> "{{ $table.WhereClass }}":
+        builder = QueryBuilder(cls.TABLE, store)
+        return {{ $table.WhereClass }}(builder, cls, cls.PRIMARY_KEY)
+
+    def create(self) -> None:
+        RowExecutor.create(self)
+
+    def update(self) -> None:
+        RowExecutor.update(self)
+
+    def delete(self) -> None:
+        RowExecutor.delete(self)
+
+
+class {{ $table.WhereClass }}:
+    def __init__(
+        self,
+        builder: QueryBuilder,
+        row_cls: Type["{{ $table.RowClass }}"],
+        primary_key: str,
+    ) -> None:
+        self._builder = builder
+        self._row_cls = row_cls
+        self._primary_key = primary_key
+
+    def project(self, *columns: str) -> "{{ $table.WhereClass }}":
+        self._builder.project(*columns)
+        return self
+
+    def field_list(self, *columns: str) -> "{{ $table.WhereClass }}":
+        return self.project(*columns)
+
+    def offset(self, value: int) -> "{{ $table.WhereClass }}":
+        self._builder.offset(value)
+        return self
+
+    def limit(self, value: int) -> "{{ $table.WhereClass }}":
+        self._builder.limit(value)
+        return self
+
+    def range(self, offset_value: int, limit_value: int) -> "{{ $table.WhereClass }}":
+        self._builder.range(offset_value, limit_value)
+        return self
+
+    def order_by(self) -> "{{ $table.OrderByClass }}":
+        return {{ $table.OrderByClass }}(self)
+
+{{- range $table.FieldsInfo }}
+    def {{ snakeCase .PascalCase }}(self, value: Optional[{{ .PythonType }}]) -> "{{ $table.WhereClass }}":
+        self._builder.filter("{{ .Original }}", Operator.EQ, value)
+        return self
+
+{{- end }}
+    def load(self) -> List[Dict[str, Any]]:
+        return self._builder.load()
+
+    def load_rows(self) -> List["{{ $table.RowClass }}"]:
+        records = self.load()
+        result: List["{{ $table.RowClass }}"] = []
+        for entry in records:
+            row = self._row_cls.new()
+            hydrate(row, entry)
+            result.append(row)
+        return result
+
+    def delete(self) -> None:
+        self._builder.delete(self._primary_key)
+
+
+class {{ $table.OrderByClass }}:
+    def __init__(self, where_builder: "{{ $table.WhereClass }}") -> None:
+        self._where = where_builder
+
+{{- range $table.FieldsInfo }}
+    def {{ snakeCase .PascalCase }}(self) -> "{{ $table.OrderByClass }}Direction":
+        return {{ $table.OrderByClass }}Direction(self, "{{ .Original }}")
+
+{{- end }}
+    def project(self, *columns: str) -> "{{ $table.WhereClass }}":
+        return self._where.project(*columns)
+
+    def field_list(self, *columns: str) -> "{{ $table.WhereClass }}":
+        return self._where.field_list(*columns)
+
+    def offset(self, value: int) -> "{{ $table.WhereClass }}":
+        return self._where.offset(value)
+
+    def limit(self, value: int) -> "{{ $table.WhereClass }}":
+        return self._where.limit(value)
+
+    def range(self, offset_value: int, limit_value: int) -> "{{ $table.WhereClass }}":
+        return self._where.range(offset_value, limit_value)
+
+    def load(self) -> List[Dict[str, Any]]:
+        return self._where.load()
+
+    def load_rows(self) -> List["{{ $table.RowClass }}"]:
+        return self._where.load_rows()
+
+    def delete(self) -> None:
+        self._where.delete()
+
+
+class {{ $table.OrderByClass }}Direction:
+    def __init__(self, order_builder: "{{ $table.OrderByClass }}", column: str) -> None:
+        self._order = order_builder
+        self._column = column
+
+    def asc(self) -> "{{ $table.OrderByClass }}":
+        self._order._where._builder.order_by(self._column, OrderDirection.ASC)
+        return self._order
+
+    def desc(self) -> "{{ $table.OrderByClass }}":
+        self._order._where._builder.order_by(self._column, OrderDirection.DESC)
+        return self._order
+
+
+class {{ $table.ColumnsDefinitionClass }}:
+{{- range $table.FieldsInfo }}
+    {{ upperSnake .PascalCase }} = "{{ .Original }}"
+{{- end }}
+
+    @classmethod
+    def list(cls) -> List[str]:
+        return [
+{{- range $table.FieldsInfo }}
+            cls.{{ upperSnake .PascalCase }},
+{{- end }}
+        ]
+
+
+class {{ $table.OrderByClass }}Definition:
+{{- range $table.FieldsInfo }}
+    {{ upperSnake .PascalCase }} = "{{ .Original }}"
+{{- end }}
+
+    @classmethod
+    def list(cls) -> List[str]:
+        return [
+{{- range $table.FieldsInfo }}
+            cls.{{ upperSnake .PascalCase }},
+{{- end }}
+        ]
+
+
+def column_list() -> List[str]:
+    return {{ $table.ColumnsDefinitionClass }}.list()
+
+
+def order_columns() -> List[str]:
+    return {{ $table.OrderByClass }}Definition.list()

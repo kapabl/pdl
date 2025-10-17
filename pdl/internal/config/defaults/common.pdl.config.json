@@ -35,6 +35,10 @@
       "language": "php",
       "enabled": false
     },
+    "python": {
+      "language": "python",
+      "enabled": false
+    },
     "csharp": {
       "language": "csharp",
       "enabled": false
